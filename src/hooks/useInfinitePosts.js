@@ -3,7 +3,7 @@ import { getPostsPage } from "../api/posts";
 
 const PAGE_SIZE = 6;
 
-export function useInfinitePosts() {
+export function useInfinitePosts(postType) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,7 +19,13 @@ export function useInfinitePosts() {
     setError("");
 
     try {
-      const page = await getPostsPage(offsetRef.current, PAGE_SIZE);
+      let page = await getPostsPage(offsetRef.current, PAGE_SIZE, postType);
+
+      if (page.length === 0) {
+        offsetRef.current = 0;
+        loopRef.current += 1;
+        page = await getPostsPage(0, PAGE_SIZE, postType);
+      }
 
       if (page.length === 0) return;
 
@@ -39,11 +45,16 @@ export function useInfinitePosts() {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, []);
+  }, [postType]);
 
   useEffect(() => {
+    offsetRef.current = 0;
+    loopRef.current = 0;
+    loadingRef.current = false;
+    setPosts([]);
+    setLoading(true);
     loadMore();
-  }, [loadMore]);
+  }, [postType, loadMore]);
 
   return { posts, loading, error, loadMore };
 }

@@ -5,12 +5,13 @@ export default function CommentList({ comments }) {
 
   return (
     <ul className="comment-list">
-      {comments.map((c) => (
+      {comments.map((c, i) => (
         <li key={c.id} className="comment">
-          <p className="comment-body">{c.comment}</p>
-          <p className="comment-meta">
-            {new Date(c.created_at).toLocaleString()}
-          </p>
+          <span className="comment-num">{String(i + 1).padStart(2, "0")}</span>
+          <div>
+            <p className="comment-body">{c.comment}</p>
+            <p className="comment-meta">{new Date(c.created_at).toLocaleString()}</p>
+          </div>
         </li>
       ))}
     </ul>

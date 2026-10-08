@@ -1,35 +1,32 @@
 import { SUPABASE_URL, SUPABASE_KEY } from "./config";
+import { handleResponse } from "./client";
 
-async function handle(response) {
-  if (response.status === 204) return null;
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      data.msg || data.message || data.error_description || "Request failed"
-    );
-  }
-  return data;
-}
+const AUTH_HEADERS = {
+  apikey: SUPABASE_KEY,
+  "Content-Type": "application/json",
+};
 
-export async function signUp(email, password) {
-  const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+async function postAuth(path, body) {
+  const response = await fetch(`${SUPABASE_URL}${path}`, {
     method: "POST",
-    headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+    headers: AUTH_HEADERS,
+    body: body ? JSON.stringify(body) : undefined,
   });
-  return handle(response);
+  return handleResponse(response);
 }
 
-export async function signIn(email, password) {
-  const response = await fetch(
-    `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
-    {
-      method: "POST",
-      headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    }
-  );
-  return handle(response);
+export function signUp(email, password) {
+  return postAuth("/auth/v1/signup", { email, password });
+}
+
+export function signIn(email, password) {
+  return postAuth("/auth/v1/token?grant_type=password", { email, password });
+}
+
+export function refreshSession(refreshToken) {
+  return postAuth("/auth/v1/token?grant_type=refresh_token", {
+    refresh_token: refreshToken,
+  });
 }
 
 export async function signOut(accessToken) {
@@ -40,16 +37,4 @@ export async function signOut(accessToken) {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-}
-
-export async function refreshSession(refreshToken) {
-  const response = await fetch(
-    `${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,
-    {
-      method: "POST",
-      headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    }
-  );
-  return handle(response);
 }

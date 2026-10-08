@@ -1,37 +1,22 @@
-import { SUPABASE_URL, SUPABASE_KEY } from "./config";
-
-const headers = (token) => ({
-  apikey: SUPABASE_KEY,
-  Authorization: `Bearer ${token || SUPABASE_KEY}`,
-  "Content-Type": "application/json",
-});
-
-async function handle(response) {
-  if (response.status === 204) return null;
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || data.error || "Request failed");
-  }
-  return data;
-}
+import { authHeaders, handleResponse, tableUrl } from "./client";
 
 export async function getCommentsForPost(postId, signal) {
-  const url = new URL("/rest/v1/comments", SUPABASE_URL);
-  url.searchParams.set("post_id", `eq.${postId}`);
-  url.searchParams.set("order", "created_at.asc");
-  url.searchParams.set("select", "*");
-
-  const response = await fetch(url, { headers: headers(), signal });
-  return handle(response);
+  const url = tableUrl("comments", {
+    post_id: `eq.${postId}`,
+    order: "created_at.asc",
+    select: "*",
+  });
+  const response = await fetch(url, { headers: authHeaders(), signal });
+  return handleResponse(response);
 }
 
 export async function createComment({ post_id, comment }, token) {
-  const url = new URL("/rest/v1/comments", SUPABASE_URL);
+  const url = tableUrl("comments");
   const response = await fetch(url, {
     method: "POST",
-    headers: { ...headers(token), Prefer: "return=representation" },
+    headers: { ...authHeaders(token), Prefer: "return=representation" },
     body: JSON.stringify({ post_id, comment }),
   });
-  const data = await handle(response);
+  const data = await handleResponse(response);
   return data?.[0] ?? null;
 }
