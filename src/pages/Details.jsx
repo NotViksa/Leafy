@@ -95,7 +95,12 @@ export default function Details() {
       {post.image_url && (
         <figure className="plate">
           <div className="plate-frame">
-            <img src={post.image_url} alt={post.title} />
+            <img
+              src={post.image_url}
+              alt={post.title}
+              width="1200"
+              height="800"
+            />
           </div>
           {isGuide && (
             <figcaption className="plate-caption">

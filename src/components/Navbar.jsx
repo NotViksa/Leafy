@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -33,13 +33,75 @@ export function NavLinks({ onNavigate }) {
   );
 }
 
+function SprigMark({ size = 22 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+      <path d="M2 21c0-3 1.85-5.36 5.08-6" />
+    </svg>
+  );
+}
+
 export default function Navbar() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const hiddenRef = useRef(false);
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+
+    function update() {
+      const y = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(max > 0 ? Math.min(1, y / max) : 0);
+
+      let nextHidden = hiddenRef.current;
+      if (y > 120 && y > lastY + 6) nextHidden = true;
+      else if (y < lastY - 12 || y < 80) nextHidden = false;
+
+      if (nextHidden !== hiddenRef.current) {
+        hiddenRef.current = nextHidden;
+        setHidden(nextHidden);
+        document.documentElement.dataset.nav = nextHidden ? "hidden" : "visible";
+      }
+
+      lastY = y;
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const dateStamp = new Date().toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 
   return (
     <>
-      <header className="navbar">
+      <header className={`navbar ${hidden && !open ? "navbar-hidden" : ""}`}>
         <div className="navbar-inner">
           <button
             className="navbar-burger"
@@ -49,17 +111,18 @@ export default function Navbar() {
             <span /><span /><span />
           </button>
 
-          <Link to="/" className="navbar-brand">Leafy</Link>
+          <Link to="/" className="navbar-brand">
+            <span className="navbar-brand-mark">
+              <SprigMark size={20} />
+            </span>
+            <span className="navbar-brand-text">
+              <span className="navbar-brand-word">Leafy</span>
+              <em className="navbar-brand-tag">Field Notes</em>
+            </span>
+          </Link>
 
-          <div className="navbar-auth">
-            {user ? (
-              <span className="navbar-user">{user.email}</span>
-            ) : (
-              <>
-                <Link to="/login" className="btn btn-ghost">Log in</Link>
-                <Link to="/register" className="btn btn-primary">Sign up</Link>
-              </>
-            )}
+          <div className="navbar-stamp" aria-hidden="true">
+            Vol. 01 · {dateStamp}
           </div>
         </div>
       </header>

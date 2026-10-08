@@ -1,0 +1,31 @@
+:root {
+  --paper:       #f7f6f2;
+  --paper-2:     #efede6;
+  --paper-3:     #e6e2d6;
+
+  --ink:         #2c342a;
+  --ink-soft:    #576050;
+  --ink-mute:    #8a8f80;
+
+  --sage:        #9fb09e;
+  --sage-deep:   #6b8069;
+  --sage-dark:   #3e4f3c;
+
+  --rust:        #b2543a;
+  --gold:        #c2953f;
+
+  --line:        #ddd8ca;
+  --line-strong: #c8c2af;
+
+  --danger:      #a8432e;
+
+  --radius-sm:   2px;
+  --radius:      3px;
+
+  --sidebar-w:   200px;
+  --navbar-h:    56px;
+  --max-width:   1240px;
+
+  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans:  "Inter", system-ui, -apple-system, sans-serif;
+}

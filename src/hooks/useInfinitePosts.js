@@ -11,6 +11,7 @@ export function useInfinitePosts(postType) {
   const offsetRef = useRef(0);
   const loopRef = useRef(0);
   const loadingRef = useRef(false);
+  const seenRef = useRef(new Set());
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current) return;
@@ -30,8 +31,18 @@ export function useInfinitePosts(postType) {
       if (page.length === 0) return;
 
       const loop = loopRef.current;
-      const tagged = page.map((p) => ({ ...p, _key: `${p.id}-${loop}` }));
-      setPosts((prev) => [...prev, ...tagged]);
+      const fresh = [];
+      for (const p of page) {
+        const key = `${p.id}-${loop}`;
+        if (!seenRef.current.has(key)) {
+          seenRef.current.add(key);
+          fresh.push({ ...p, _key: key });
+        }
+      }
+
+      if (fresh.length > 0) {
+        setPosts((prev) => [...prev, ...fresh]);
+      }
 
       if (page.length < PAGE_SIZE) {
         offsetRef.current = 0;
@@ -51,6 +62,7 @@ export function useInfinitePosts(postType) {
     offsetRef.current = 0;
     loopRef.current = 0;
     loadingRef.current = false;
+    seenRef.current = new Set();
     setPosts([]);
     setLoading(true);
     loadMore();

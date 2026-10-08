@@ -42,9 +42,19 @@ export default function PostCard({ post }) {
         </h2>
 
         {showImage && (
-          <Link to={`/feed/${post.id}`} className="post-image">
-            <img src={post.image_url} alt={post.title} loading="lazy" />
-          </Link>
+        <Link to={`/feed/${post.id}`} className="post-image">
+          {post.image_url ? (
+            <img
+              src={post.image_url}
+              alt={post.title}
+              loading="lazy"
+              width="1200"
+              height="800"
+            />
+          ) : (
+            <div className="post-image-empty">No image</div>
+          )}
+        </Link>
         )}
 
         <p className="post-desc">{post.description}</p>
