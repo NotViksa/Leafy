@@ -121,3 +121,120 @@ select:focus {
   border-radius: 6px;
   font-size: 0.9rem;
 }
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.page h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.page-loading {
+  padding: 3rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.navbar {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navbar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--text);
+}
+
+.navbar-brand:hover {
+  color: var(--accent);
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.2rem;
+  flex: 1;
+}
+
+.navbar-links a {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.navbar-links a.active {
+  color: var(--accent);
+}
+
+.navbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.navbar-user {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-deep);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: var(--accent-2);
+  color: var(--bg-deep);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.footer-muted {
+  margin-top: 0.3rem;
+  opacity: 0.7;
+}

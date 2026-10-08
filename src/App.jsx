@@ -1,34 +1,76 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
+import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import GuestRoute from "./components/GuestRoute";
+import Home from "./pages/Home";
+import Feed from "./pages/Feed";
+import Details from "./pages/Details";
+import Create from "./pages/Create";
+import Edit from "./pages/Edit";
+import MyPosts from "./pages/MyPosts";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import About from "./pages/About";
+import NotFound from "./pages/NotFound";
 
-function DebugBar() {
-  const { user, loading, accessToken } = useAuth();
-  return (
-    <div style={{ padding: "1rem", background: "#1a4a34", fontSize: "0.85rem" }}>
-      {loading
-        ? "Loading session..."
-        : user
-        ? `Logged in as: ${user.email} (token: ${accessToken?.slice(0, 12)}...)`
-        : "Not logged in"}
-    </div>
-  );
-}
-
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <DebugBar />
         <Routes>
-          <Route path="/" element={<div style={{ padding: "2rem" }}>Home</div>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/feed/:postId" element={<Details />} />
+            <Route path="/about" element={<About />} />
+
+            <Route
+              path="/feed/:postId/edit"
+              element={
+                <ProtectedRoute>
+                  <Edit />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create"
+              element={
+                <ProtectedRoute>
+                  <Create />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-posts"
+              element={
+                <ProtectedRoute>
+                  <MyPosts />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/login"
+              element={
+                <GuestRoute>
+                  <Login />
+                </GuestRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <GuestRoute>
+                  <Register />
+                </GuestRoute>
+              }
+            />
+
+            <Route path="*" element={<NotFound />} />
+          </Route>
         </Routes>
       </AuthProvider>
     </BrowserRouter>
   );
 }
-
-export default App;
