@@ -24,8 +24,8 @@ export default function Feed() {
   return (
     <>
       <header className="feed-header">
-        <h1>Feed</h1>
-        <p className="feed-sub">Fresh plant care guides from the community</p>
+          <h1>The Feed</h1>
+          <p className="feed-sub">Volume 01 · A community of plant keepers</p>
       </header>
 
       {error && <p className="form-error" style={{ marginTop: 16 }}>{error}</p>}
