@@ -42,7 +42,10 @@ export default function Register() {
 
     setSubmitting(true);
     try {
-      const { needsConfirmation } = await signUp(form.email.trim(), form.password);
+      const { needsConfirmation } = await signUp(
+        form.email.trim(),
+        form.password
+      );
       if (needsConfirmation) {
         setApiError("Check your email to confirm your account, then log in.");
         return;
@@ -61,47 +64,56 @@ export default function Register() {
 
       {apiError && <p className="form-error">{apiError}</p>}
 
-      <label>
-        Email
+      <div className="form-field">
+        <label htmlFor="reg-email">Email</label>
         <input
+          id="reg-email"
           type="email"
           name="email"
           value={form.email}
           onChange={handleChange}
           autoComplete="email"
         />
-      </label>
-      {errors.email && <span className="field-error">{errors.email}</span>}
+        {errors.email && <span className="field-error">{errors.email}</span>}
+      </div>
 
-      <label>
-        Password
+      <div className="form-field">
+        <label htmlFor="reg-password">Password</label>
         <input
+          id="reg-password"
           type="password"
           name="password"
           value={form.password}
           onChange={handleChange}
           autoComplete="new-password"
         />
-      </label>
-      {errors.password && <span className="field-error">{errors.password}</span>}
+        {errors.password && (
+          <span className="field-error">{errors.password}</span>
+        )}
+      </div>
 
-      <label>
-        Confirm password
+      <div className="form-field">
+        <label htmlFor="reg-confirm">Confirm password</label>
         <input
+          id="reg-confirm"
           type="password"
           name="confirm"
           value={form.confirm}
           onChange={handleChange}
           autoComplete="new-password"
         />
-      </label>
-      {errors.confirm && <span className="field-error">{errors.confirm}</span>}
+        {errors.confirm && <span className="field-error">{errors.confirm}</span>}
+      </div>
 
-      <button type="submit" disabled={submitting}>
-        {submitting ? "Creating account..." : "Create account"}
+      <button
+        type="submit"
+        className="btn btn-primary btn-block"
+        disabled={submitting}
+      >
+        {submitting ? "Creating account…" : "Create account"}
       </button>
 
-      <p style={{ textAlign: "center", color: "var(--muted)", fontSize: "0.9rem" }}>
+      <p className="form-foot">
         Already a member? <Link to="/login">Log in</Link>
       </p>
     </form>

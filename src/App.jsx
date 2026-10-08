@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import Layout from "./components/Layout";
+import AuthLayout from "./components/AuthLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import GuestRoute from "./components/GuestRoute";
 import Home from "./pages/Home";
@@ -24,50 +25,24 @@ export default function App() {
             <Route path="/feed" element={<Feed />} />
             <Route path="/feed/:postId" element={<Details />} />
             <Route path="/about" element={<About />} />
-
             <Route
               path="/feed/:postId/edit"
-              element={
-                <ProtectedRoute>
-                  <Edit />
-                </ProtectedRoute>
-              }
+              element={<ProtectedRoute><Edit /></ProtectedRoute>}
             />
             <Route
               path="/create"
-              element={
-                <ProtectedRoute>
-                  <Create />
-                </ProtectedRoute>
-              }
+              element={<ProtectedRoute><Create /></ProtectedRoute>}
             />
             <Route
               path="/my-posts"
-              element={
-                <ProtectedRoute>
-                  <MyPosts />
-                </ProtectedRoute>
-              }
+              element={<ProtectedRoute><MyPosts /></ProtectedRoute>}
             />
-
-            <Route
-              path="/login"
-              element={
-                <GuestRoute>
-                  <Login />
-                </GuestRoute>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <GuestRoute>
-                  <Register />
-                </GuestRoute>
-              }
-            />
-
             <Route path="*" element={<NotFound />} />
+          </Route>
+
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+            <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
           </Route>
         </Routes>
       </AuthProvider>

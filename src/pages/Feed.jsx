@@ -22,27 +22,26 @@ export default function Feed() {
   }, [loadMore]);
 
   return (
-    <div className="page">
-      <header className="page-header">
+    <>
+      <header className="feed-header">
         <h1>Feed</h1>
-        <p className="page-sub">Fresh plant care guides from the community</p>
+        <p className="feed-sub">Fresh plant care guides from the community</p>
       </header>
 
-      {error && <p className="form-error">{error}</p>}
+      {error && <p className="form-error" style={{ marginTop: 16 }}>{error}</p>}
 
       {!loading && posts.length === 0 && !error && (
         <p className="empty">No posts yet. Be the first to share one.</p>
       )}
 
-      <div className="post-list">
+      <div className="feed-list">
         {posts.map((post) => (
           <PostCard key={post._key} post={post} />
         ))}
       </div>
 
       <div ref={sentinelRef} className="sentinel" />
-
       {loading && <p className="page-loading">Loading more…</p>}
-    </div>
+    </>
   );
 }

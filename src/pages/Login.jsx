@@ -50,35 +50,37 @@ export default function Login() {
 
       {apiError && <p className="form-error">{apiError}</p>}
 
-      <label>
-        Email
+      <div className="form-field">
+        <label htmlFor="login-email">Email</label>
         <input
+          id="login-email"
           type="email"
           name="email"
           value={form.email}
           onChange={handleChange}
           autoComplete="email"
         />
-      </label>
-      {errors.email && <span className="field-error">{errors.email}</span>}
+        {errors.email && <span className="field-error">{errors.email}</span>}
+      </div>
 
-      <label>
-        Password
+      <div className="form-field">
+        <label htmlFor="login-password">Password</label>
         <input
+          id="login-password"
           type="password"
           name="password"
           value={form.password}
           onChange={handleChange}
           autoComplete="current-password"
         />
-      </label>
-      {errors.password && <span className="field-error">{errors.password}</span>}
+        {errors.password && <span className="field-error">{errors.password}</span>}
+      </div>
 
-      <button type="submit" disabled={submitting}>
-        {submitting ? "Signing in..." : "Sign in"}
+      <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+        {submitting ? "Signing in…" : "Sign in"}
       </button>
 
-      <p style={{ textAlign: "center", color: "var(--muted)", fontSize: "0.9rem" }}>
+      <p className="form-foot">
         No account? <Link to="/register">Create one</Link>
       </p>
     </form>
