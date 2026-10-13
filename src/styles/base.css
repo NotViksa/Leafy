@@ -4,10 +4,7 @@ html, body, #root { height: 100%; }
 
 body {
   background-color: var(--paper);
-  background-image:
-    linear-gradient(to right, rgba(159, 176, 158, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(159, 176, 158, 0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M28 0H0V28' fill='none' stroke='%239fb09e' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E");
   background-attachment: fixed;
   color: var(--ink);
   font-family: var(--sans);
@@ -23,9 +20,7 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background:
-    radial-gradient(circle at 10% 6%, rgba(159, 176, 158, 0.28), transparent 42%),
-    radial-gradient(circle at 92% 94%, rgba(194, 149, 63, 0.10), transparent 45%);
+  background: rgba(159, 176, 158, 0.06);
 }
 
 #root { position: relative; z-index: 1; }
@@ -206,6 +201,13 @@ h1, h2, h3, h4 {
   height: calc(100vh - var(--navbar-h));
   display: flex;
   flex-direction: column;
+  transition: top 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html[data-nav="hidden"] .sidebar {
+  top: 0;
+  height: 100vh;
 }
 
 .sidebar-cta {
@@ -322,40 +324,23 @@ h1, h2, h3, h4 {
   gap: 8px;
 }
 
-/* Responsive */
-@media (max-width: 880px) {
-  .app-body { grid-template-columns: 1fr; padding: 0 24px; column-gap: 0; }
+/* Responsive — larger first, smaller last */
+@media (max-width: 1024px) {
+  .app-body {
+    grid-template-columns: 1fr;
+    padding: 0 24px;
+    column-gap: 0;
+  }
   .sidebar { display: none; }
   .app-main { max-width: none; }
   .navbar-inner { padding: 0 20px; gap: 12px; }
-  .navbar-stamp { display: none; }
   .navbar-burger { display: flex; }
+  .navbar-stamp { display: none; }
   .navbar-brand-word { font-size: 17px; }
   .navbar-brand-tag { display: none; }
   .navbar-brand-mark { width: 28px; height: 28px; }
   .navbar-auth .btn-ghost { display: none; }
   .footer { padding: 24px; }
-}
-
-.sidebar {
-  padding: 44px 0 24px;
-  align-self: start;
-  position: sticky;
-  top: var(--navbar-h);
-  height: calc(100vh - var(--navbar-h));
-  display: flex;
-  flex-direction: column;
-  transition: top 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-              height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-html[data-nav="hidden"] .sidebar {
-  top: 0;
-  height: 100vh;
-}
-
-html[data-nav="hidden"] .sidebar {
-  top: 0;
 }
 
 @media (max-width: 640px) {
@@ -371,56 +356,7 @@ html[data-nav="hidden"] .sidebar {
   .app-body { padding: 0 16px; }
   .app-main { padding: 24px 0 60px; }
 
-  .feed-header { padding-bottom: 16px; }
-  .feed-header h1 { font-size: 28px; }
-  .feed-sub { font-size: 10px; letter-spacing: 0.1em; }
-
-  .feed-filters { padding: 12px 0 20px; gap: 2px; }
-  .feed-filter { padding: 5px 9px; font-size: 11px; letter-spacing: 0.04em; }
-
-  .post { padding: 24px 0 28px; }
-  .post-title { font-size: 20px; }
-  .post-image { padding: 6px; }
-  .post-image img { max-height: 320px; }
-
-  .form-card { padding: 28px 20px 20px; max-width: 100%; }
-  .form-card h1 { font-size: 22px; }
-
-  .editor-head h1 { font-size: 32px; }
-  .editor-head { padding-bottom: 16px; margin-bottom: 24px; }
-  .editor-form { gap: 24px; }
-  .editor-section { gap: 14px; }
-  .editor-actions { flex-direction: column-reverse; }
-  .editor-actions .btn { width: 100%; }
-
-  .details-title { font-size: 28px; line-height: 1.15; }
-  .details-kicker { font-size: 9px; }
-  .details-desc { font-size: 18px; padding-left: 14px; }
-  .details-content { font-size: 15px; }
-  .plate-frame { padding: 8px; }
-  .plate-frame img { max-height: 420px; }
-
-  .comments-heading { font-size: 20px; }
+  .footer { padding: 20px 16px; font-size: 10px; }
 
   .mobile-drawer { width: 88vw; padding: 20px 16px; }
-
-  .footer { padding: 20px 16px; font-size: 10px; }
-}
-
-@media (max-width: 1024px) {
-  .app-body {
-    grid-template-columns: 1fr;
-    padding: 0 24px;
-    column-gap: 0;
-  }
-  .sidebar { display: none !important; }
-  .app-main { max-width: none; }
-  .navbar-inner { padding: 0 20px; gap: 12px; }
-  .navbar-burger { display: flex; }
-  .navbar-stamp { display: none; }
-  .navbar-brand-word { font-size: 17px; }
-  .navbar-brand-tag { display: none; }
-  .navbar-brand-mark { width: 28px; height: 28px; }
-  .navbar-auth .btn-ghost { display: none; }
-  .footer { padding: 24px; }
 }
