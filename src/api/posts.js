@@ -1,6 +1,6 @@
 import { authHeaders, handleResponse, tableUrl } from "./client";
 
-export async function getPostsPage(offset, limit, postType, signal) {
+export async function getPostsPage(offset, limit, postType, search, signal) {
   const params = {
     select: "*",
     order: "created_at.desc",
@@ -8,6 +8,13 @@ export async function getPostsPage(offset, limit, postType, signal) {
     limit,
   };
   if (postType) params.post_type = `eq.${postType}`;
+
+  if (search) {
+    const safe = search.replace(/[,()*]/g, "").trim();
+    if (safe) {
+      params.or = `(title.ilike.*${safe}*,description.ilike.*${safe}*)`;
+    }
+  }
 
   const url = tableUrl("posts", params);
   const response = await fetch(url, { headers: authHeaders(), signal });

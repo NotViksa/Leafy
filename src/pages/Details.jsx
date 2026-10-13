@@ -30,13 +30,17 @@ export default function Details() {
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
+  
 
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
+    setHasLoaded(true);
     setError("");
+    
 
     Promise.all([
       getPostById(postId, controller.signal),
@@ -73,7 +77,7 @@ export default function Details() {
     setComments((prev) => [...prev, newComment]);
   }
 
-if (loading) return <DetailsSkeleton />;
+if (loading && !hasLoaded) return <DetailsSkeleton />;
 if (error) return <p className="form-error">{error}</p>;
 if (!post) {
   return (

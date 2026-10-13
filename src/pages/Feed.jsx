@@ -1,8 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useInfinitePosts } from "../hooks/useInfinitePosts";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import PostCard from "../components/PostCard";
 import EmptyState from "../components/EmptyState";
+import SearchBar from "../components/SearchBar";
 import { PostCardSkeleton } from "../components/Skeleton";
 import { POST_TYPES } from "../lib/postForm";
 
@@ -11,8 +13,22 @@ const FILTERS = [{ value: "", label: "All" }, ...POST_TYPES];
 export default function Feed() {
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get("type") ?? "";
+  const urlQuery = searchParams.get("q") ?? "";
 
-  const { posts, loading, error, loadMore } = useInfinitePosts(typeFilter || null);
+  const [searchInput, setSearchInput] = useState(urlQuery);
+  const debouncedSearch = useDebouncedValue(searchInput, 350);
+
+  useEffect(() => {
+    if (debouncedSearch === urlQuery) return;
+    const next = {};
+    if (typeFilter) next.type = typeFilter;
+    if (debouncedSearch.trim()) next.q = debouncedSearch.trim();
+    setSearchParams(next, { replace: true });
+  }, [debouncedSearch, typeFilter, urlQuery, setSearchParams]);
+
+const { posts, loading, error, loadMore, hasLoadedOnce } =
+  useInfinitePosts(typeFilter || null, urlQuery || null);
+
   const sentinelRef = useRef(null);
 
   useEffect(() => {
@@ -31,11 +47,13 @@ export default function Feed() {
   }, [loadMore]);
 
   function setFilter(value) {
-    if (value) setSearchParams({ type: value });
-    else setSearchParams({});
+    const next = {};
+    if (value) next.type = value;
+    if (urlQuery) next.q = urlQuery;
+    setSearchParams(next);
   }
 
-  const isInitialLoad = loading && posts.length === 0;
+const isInitialLoad = loading && !hasLoadedOnce;
   const isEmpty = !loading && posts.length === 0 && !error;
 
   return (
@@ -44,6 +62,13 @@ export default function Feed() {
         <h1>The Feed</h1>
         <p className="feed-sub">Volume 01 · A community of plant keepers</p>
       </header>
+
+      <SearchBar
+        value={searchInput}
+        onChange={setSearchInput}
+        label="Find in the feed"
+        placeholder="Search by title or description…"
+      />
 
       <nav className="feed-filters">
         {FILTERS.map((f) => (
@@ -69,19 +94,21 @@ export default function Feed() {
 
       {isEmpty && (
         <EmptyState
-          kicker={typeFilter ? "No matches" : "Blank page"}
+          kicker={urlQuery ? "No matches" : typeFilter ? "No matches" : "Blank page"}
           title={
-            typeFilter
+            urlQuery
+              ? `Nothing matches “${urlQuery}”.`
+              : typeFilter
               ? "Nothing under this filter yet."
               : "The feed is empty."
           }
           message={
-            typeFilter
-              ? "Try a different filter, or be the first to post under this type."
+            urlQuery
+              ? "Try a different word, or clear the search."
               : "Be the first to share a plant guide with the community."
           }
-          ctaTo="/create"
-          ctaLabel="Write the first entry"
+          ctaTo={urlQuery ? undefined : "/create"}
+          ctaLabel={urlQuery ? undefined : "Write the first entry"}
         />
       )}
 

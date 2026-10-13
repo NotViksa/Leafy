@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import { getPostsByOwner, deletePost } from "../api/posts";
 import EmptyState from "../components/EmptyState";
 import { POST_TYPES } from "../lib/postForm";
+import SearchBar from "../components/SearchBar";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 const TYPE_LABELS = {
   guide: "Guide",
@@ -20,6 +22,8 @@ export default function MyPosts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("");
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 250);
 
   useEffect(() => {
     if (!user) return;
@@ -52,10 +56,20 @@ export default function MyPosts() {
     }
   }
 
-  const filtered = useMemo(
-    () => (filter ? posts.filter((p) => p.post_type === filter) : posts),
-    [posts, filter]
-  );
+  const filtered = useMemo(() => {
+    let result = posts;
+    if (filter) result = result.filter((p) => p.post_type === filter);
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.trim().toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          (p.plant_name ?? "").toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [posts, filter, debouncedSearch]);
 
   const counts = useMemo(() => {
     const map = { "": posts.length };
@@ -75,23 +89,32 @@ export default function MyPosts() {
       </header>
 
       <div className="my-posts-bar">
-        <nav className="feed-filters">
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              className={`feed-filter ${filter === f.value ? "active" : ""}`}
-              onClick={() => setFilter(f.value)}
-              disabled={counts[f.value] === 0 && f.value !== ""}
-            >
-              {f.label}
-              {counts[f.value] > 0 && (
-                <span className="feed-filter-count">{counts[f.value]}</span>
-              )}
-            </button>
-          ))}
-        </nav>
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          label="Find in your entries"
+          placeholder="Search by title, description, or plant…"
+        />
 
-        <Link to="/create" className="btn btn-primary">New entry</Link>
+        <div className="my-posts-bar">
+          <nav className="feed-filters">
+            {FILTERS.map((f) => (
+              <button
+                key={f.value}
+                className={`feed-filter ${filter === f.value ? "active" : ""}`}
+                onClick={() => setFilter(f.value)}
+                disabled={counts[f.value] === 0 && f.value !== ""}
+              >
+                {f.label}
+                {counts[f.value] > 0 && (
+                  <span className="feed-filter-count">{counts[f.value]}</span>
+                )}
+              </button>
+            ))}
+          </nav>
+
+          <Link to="/create" className="btn btn-primary">New entry</Link>
+        </div>
       </div>
 
       {error && <p className="form-error">{error}</p>}
@@ -108,13 +131,21 @@ export default function MyPosts() {
         />
       )}
 
-      {!loading && posts.length > 0 && filtered.length === 0 && (
-        <EmptyState
-          kicker="No matches"
-          title="Nothing under this filter."
-          message="You have not written any entries of this type yet."
-        />
-      )}
+{!loading && posts.length > 0 && filtered.length === 0 && (
+  <EmptyState
+    kicker="No matches"
+    title={
+      debouncedSearch.trim()
+        ? `Nothing matches “${debouncedSearch.trim()}”.`
+        : "Nothing under this filter."
+    }
+    message={
+      debouncedSearch.trim()
+        ? "Try a different word, or clear the search."
+        : "You have not written any entries of this type yet."
+    }
+  />
+)}
 
       {!loading && filtered.length > 0 && (
         <div className="entry-grid">

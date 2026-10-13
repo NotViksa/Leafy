@@ -852,7 +852,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 0 24px;
+  padding: 0 0 24px;
   flex-wrap: wrap;
 }
 
@@ -1135,4 +1135,26 @@
   .not-found { padding: 56px 0; }
   .not-found-num { font-size: 72px; }
   .not-found-title { font-size: 20px; }
+}
+
+/* Smooth skeleton → content transition */
+@keyframes leaf-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.feed-list,
+.details,
+.entry-grid,
+.empty-state {
+  animation: leaf-fade-in 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feed-list,
+  .details,
+  .entry-grid,
+  .empty-state {
+    animation: none;
+  }
 }
