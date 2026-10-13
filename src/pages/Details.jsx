@@ -5,6 +5,8 @@ import { getPostById, deletePost } from "../api/posts";
 import { getCommentsForPost } from "../api/comments";
 import CommentList from "../components/CommentList";
 import CommentForm from "../components/CommentForm";
+import EmptyState from "../components/EmptyState";
+import { DetailsSkeleton } from "../components/Skeleton";
 
 const TYPE_LABELS = {
   guide: "Guide",
@@ -71,9 +73,19 @@ export default function Details() {
     setComments((prev) => [...prev, newComment]);
   }
 
-  if (loading) return <p className="page-loading">Loading entry…</p>;
-  if (error) return <p className="form-error">{error}</p>;
-  if (!post) return <p className="empty">Entry not found.</p>;
+if (loading) return <DetailsSkeleton />;
+if (error) return <p className="form-error">{error}</p>;
+if (!post) {
+  return (
+    <EmptyState
+      kicker="404 · Missing entry"
+      title="This entry does not exist."
+      message="It may have been deleted by its author, or the link may be wrong."
+      ctaTo="/feed"
+      ctaLabel="Back to the feed"
+    />
+  );
+}
 
   const type = post.post_type ?? "guide";
   const isOwner = user && post.owner_id === user.id;
