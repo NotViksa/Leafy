@@ -81,7 +81,7 @@ export default function Edit() {
   return (
     <PostForm
       pageTitle="Edit entry"
-      subtitle="Update your entry — changes appear immediately"
+      subtitle="Update your entry - changes appear immediately"
       form={form}
       errors={errors}
       apiError={apiError}

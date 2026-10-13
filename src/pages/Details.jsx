@@ -104,7 +104,7 @@ export default function Details() {
           </div>
           {isGuide && (
             <figcaption className="plate-caption">
-              Plate {entryNum} — {post.plant_name}
+              Plate {entryNum} - {post.plant_name}
             </figcaption>
           )}
         </figure>
