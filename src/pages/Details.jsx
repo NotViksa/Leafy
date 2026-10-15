@@ -7,6 +7,7 @@ import CommentList from "../components/CommentList";
 import CommentForm from "../components/CommentForm";
 import EmptyState from "../components/EmptyState";
 import { DetailsSkeleton } from "../components/Skeleton";
+import { DEFAULT_AVATAR } from "../lib/profile";
 
 const TYPE_LABELS = {
   guide: "Guide",
@@ -86,6 +87,12 @@ export default function Details() {
     setComments((prev) => prev.filter((c) => c.id !== id));
   }
 
+  function handleCommentUpdated(updated) {
+    setComments((prev) =>
+      prev.map((c) => (c.id === updated.id ? updated : c))
+    );
+  }
+
 if (loading && !hasLoaded) return <DetailsSkeleton />;
 if (error) return <p className="form-error">{error}</p>;
 if (!post) {
@@ -111,10 +118,23 @@ if (!post) {
 
       <header className="details-head">
         <p className="details-kicker">
-          {TYPE_LABELS[type]} · N°{entryNum} · by {post.author_name}
+          {TYPE_LABELS[type]} · N°{entryNum}
         </p>
         <h1 className="details-title">{post.title}</h1>
         {post.plant_name && <p className="details-plant">{post.plant_name}</p>}
+        <div className="details-author author-line">
+          <img
+            className="avatar avatar-md"
+            src={post.author_avatar || DEFAULT_AVATAR}
+            alt=""
+            width="40"
+            height="40"
+          />
+          <div>
+            <span className="author-line-name">{post.author_name}</span>
+            <span className="author-line-label">Author</span>
+          </div>
+        </div>
       </header>
 
       {post.image_url && (
@@ -172,7 +192,11 @@ if (!post) {
           {COMMENT_HEADINGS[type]} <span>{comments.length} total</span>
         </h2>
 
-        <CommentList comments={comments} onDeleted={handleCommentDeleted} />
+        <CommentList
+          comments={comments}
+          onDeleted={handleCommentDeleted}
+          onUpdated={handleCommentUpdated}
+        />
 
         {user ? (
           <CommentForm postId={post.id} onAdded={handleCommentAdded} />

@@ -6,7 +6,12 @@ export default function Register() {
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ email: "", password: "", confirm: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirm: "",
+  });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -17,6 +22,12 @@ export default function Register() {
 
   function validate() {
     const next = {};
+
+    const name = form.name.trim();
+    if (name && name.length < 2)
+      next.name = "Display name must be at least 2 characters";
+    else if (name.length > 40)
+      next.name = "Display name must be under 40 characters";
 
     if (!form.email.trim()) next.email = "Email is required";
     else if (!/^\S+@\S+\.\S+$/.test(form.email))
@@ -44,7 +55,8 @@ export default function Register() {
     try {
       const { needsConfirmation } = await signUp(
         form.email.trim(),
-        form.password
+        form.password,
+        form.name.trim()
       );
       if (needsConfirmation) {
         setApiError("Check your email to confirm your account, then log in.");
@@ -63,6 +75,20 @@ export default function Register() {
       <h1>Join Leafy</h1>
 
       {apiError && <p className="form-error">{apiError}</p>}
+
+      <div className="form-field">
+        <label htmlFor="reg-name">Display name</label>
+        <input
+          id="reg-name"
+          type="text"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          autoComplete="nickname"
+          placeholder="Optional - shown on your entries and comments"
+        />
+        {errors.name && <span className="field-error">{errors.name}</span>}
+      </div>
 
       <div className="form-field">
         <label htmlFor="reg-email">Email</label>

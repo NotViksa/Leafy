@@ -7,8 +7,8 @@ import {
   EMPTY_POST,
   validatePost,
   toPayload,
-  authorNameFromEmail,
 } from "../lib/postForm";
+import { profileName, profileAvatar } from "../lib/profile";
 
 export default function Create() {
   const { user, accessToken } = useAuth();
@@ -36,8 +36,10 @@ export default function Create() {
 
     setSubmitting(true);
     try {
-      const authorName = authorNameFromEmail(user.email);
-      const created = await createPost(toPayload(form, authorName), accessToken);
+      const created = await createPost(
+        toPayload(form, profileName(user), profileAvatar(user)),
+        accessToken
+      );
       navigate(`/feed/${created.id}`, { replace: true });
     } catch (err) {
       setApiError(err.message || "Could not create post");

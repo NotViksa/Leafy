@@ -12,6 +12,7 @@ export default function Edit() {
 
   const [form, setForm] = useState(EMPTY_POST);
   const [authorName, setAuthorName] = useState("");
+  const [authorAvatar, setAuthorAvatar] = useState(null);
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
@@ -28,6 +29,7 @@ export default function Edit() {
           return setApiError("You can only edit your own posts.");
         setForm(fromPost(post));
         setAuthorName(post.author_name);
+        setAuthorAvatar(post.author_avatar ?? null);
         setReady(true);
       })
       .catch((err) => {
@@ -58,7 +60,11 @@ export default function Edit() {
 
     setSubmitting(true);
     try {
-      await updatePost(postId, toPayload(form, authorName), accessToken);
+      await updatePost(
+        postId,
+        toPayload(form, authorName, authorAvatar),
+        accessToken
+      );
       navigate(`/feed/${postId}`, { replace: true });
     } catch (err) {
       setApiError(err.message || "Could not update post");

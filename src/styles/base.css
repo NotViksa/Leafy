@@ -267,6 +267,36 @@ html[data-nav="hidden"] .sidebar {
   font-family: var(--sans);
 }
 
+.sidebar-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px;
+  min-width: 0;
+}
+
+.sidebar-account-id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sidebar-account-name {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-account .sidebar-foot-email { padding: 0; }
+
+.sidebar-account:hover .sidebar-account-name { color: var(--sage-dark); }
+.sidebar-account:hover .sidebar-foot-email { color: var(--sage-dark); }
+
 /* Footer */
 .footer {
   border-top: 1px solid var(--line);

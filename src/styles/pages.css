@@ -35,6 +35,7 @@
 
 .feed-filters {
   display: flex;
+  align-items: center;
   gap: 4px;
   padding: 16px 0 24px;
   flex-wrap: wrap;
@@ -225,6 +226,8 @@
   font-size: 18px;
   color: var(--sage-deep);
 }
+
+.details-author { margin-top: 18px; }
 
 .plate { margin: 32px 0 12px; }
 .plate-frame {
@@ -817,15 +820,9 @@
 /* ============================================================
    My entries
    ============================================================ */
-.my-posts-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 0 0 24px;
-  flex-wrap: wrap;
+.my-posts-new {
+  margin-left: auto;
 }
-.my-posts-bar .feed-filters { padding: 0; }
 
 .feed-filter-count {
   margin-left: 6px;
@@ -1040,5 +1037,4 @@
   .not-found-title { font-size: 20px; }
 
   .entry-grid { grid-template-columns: 1fr; }
-  .my-posts-bar { padding: 0 0 20px; }
 }

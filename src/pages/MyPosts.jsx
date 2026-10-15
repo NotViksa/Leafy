@@ -88,34 +88,30 @@ export default function MyPosts() {
         </p>
       </header>
 
-      <div className="my-posts-bar">
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          label="Find in your entries"
-          placeholder="Search by title, description, or plant…"
-        />
+      <SearchBar
+        value={search}
+        onChange={setSearch}
+        label="Find in your entries"
+        placeholder="Search by title, description, or plant…"
+      />
 
-        <div className="my-posts-bar">
-          <nav className="feed-filters">
-            {FILTERS.map((f) => (
-              <button
-                key={f.value}
-                className={`feed-filter ${filter === f.value ? "active" : ""}`}
-                onClick={() => setFilter(f.value)}
-                disabled={counts[f.value] === 0 && f.value !== ""}
-              >
-                {f.label}
-                {counts[f.value] > 0 && (
-                  <span className="feed-filter-count">{counts[f.value]}</span>
-                )}
-              </button>
-            ))}
-          </nav>
+      <nav className="feed-filters">
+        {FILTERS.map((f) => (
+          <button
+            key={f.value}
+            className={`feed-filter ${filter === f.value ? "active" : ""}`}
+            onClick={() => setFilter(f.value)}
+            disabled={counts[f.value] === 0 && f.value !== ""}
+          >
+            {f.label}
+            {counts[f.value] > 0 && (
+              <span className="feed-filter-count">{counts[f.value]}</span>
+            )}
+          </button>
+        ))}
 
-          <Link to="/create" className="btn btn-primary">New entry</Link>
-        </div>
-      </div>
+        <Link to="/create" className="btn btn-primary my-posts-new">New entry</Link>
+      </nav>
 
       {error && <p className="form-error">{error}</p>}
 

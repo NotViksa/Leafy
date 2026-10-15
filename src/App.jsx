@@ -10,6 +10,7 @@ import Details from "./pages/Details";
 import Create from "./pages/Create";
 import Edit from "./pages/Edit";
 import MyPosts from "./pages/MyPosts";
+import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import About from "./pages/About";
@@ -36,6 +37,10 @@ export default function App() {
             <Route
               path="/my-posts"
               element={<ProtectedRoute><MyPosts /></ProtectedRoute>}
+            />
+            <Route
+              path="/profile"
+              element={<ProtectedRoute><Profile /></ProtectedRoute>}
             />
             <Route path="*" element={<NotFound />} />
           </Route>

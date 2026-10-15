@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { createComment } from "../api/comments";
-
-const MAX_LEN = 500;
+import { COMMENT_MAX_LEN } from "../lib/comments";
+import { profileName, profileAvatar } from "../lib/profile";
 
 export default function CommentForm({ postId, onAdded }) {
-  const { accessToken } = useAuth();
+  const { user, accessToken } = useAuth();
   const [text, setText] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -19,15 +19,20 @@ export default function CommentForm({ postId, onAdded }) {
       setError("Comment cannot be empty.");
       return;
     }
-    if (trimmed.length > MAX_LEN) {
-      setError(`Comment is too long (max ${MAX_LEN} characters).`);
+    if (trimmed.length > COMMENT_MAX_LEN) {
+      setError(`Comment is too long (max ${COMMENT_MAX_LEN} characters).`);
       return;
     }
 
     setSubmitting(true);
     try {
       const created = await createComment(
-        { post_id: Number(postId), comment: trimmed },
+        {
+          post_id: Number(postId),
+          comment: trimmed,
+          author_name: profileName(user),
+          author_avatar: profileAvatar(user),
+        },
         accessToken
       );
       onAdded(created);
@@ -46,12 +51,12 @@ export default function CommentForm({ postId, onAdded }) {
         onChange={(e) => setText(e.target.value)}
         placeholder="Share your thoughts…"
         rows={3}
-        maxLength={MAX_LEN + 50}
+        maxLength={COMMENT_MAX_LEN + 50}
       />
       {error && <p className="field-error">{error}</p>}
       <div className="comment-form-foot">
         <span className="comment-form-count">
-          {text.length}/{MAX_LEN}
+          {text.length}/{COMMENT_MAX_LEN}
         </span>
         <button type="submit" className="btn btn-primary" disabled={submitting}>
           {submitting ? "Posting…" : "Post comment"}

@@ -42,9 +42,9 @@ src/
 ├── components/  layout, navbar, cards, forms, guards, states
 ├── context/     AuthContext
 ├── hooks/       useInfinitePosts, useDebouncedValue
-├── lib/         postForm (validation + payload helpers)
-├── pages/       Home, Feed, Details, Create, Edit, MyPosts, Login,
-│                Register, About, NotFound
+├── lib/         postForm + profile (validation, payload, display name/avatar helpers)
+├── pages/       Home, Feed, Details, Create, Edit, MyPosts, Profile,
+│                Login, Register, About, NotFound
 ├── styles/      tokens, base, components, pages
 ├── App.jsx
 └── main.jsx
@@ -68,17 +68,24 @@ specific houseplants alive, and to read what others have figured out.
 **Guests** see Home, Feed, Details, About, Login, Register. They can read
 posts and comments but can't write anything.
 
-**Logged-in users** get everything above plus Create, My Posts, and Edit
-on their own entries. Comment authors can delete their own comments.
+**Logged-in users** get everything above plus Create, My Posts, Profile,
+and Edit on their own entries. Comment authors can edit and delete their
+own comments.
 
 **Admins** (accounts with `role = admin` in Supabase `app_metadata`) can
-delete any entry or comment from the details page.
+delete any entry or comment from the details page - delete only; editing
+always stays with the author.
 
 ## 3. Auth
 
 Register and Login both hit Supabase Auth endpoints. On success the session
 (access token, refresh token, user) goes into `AuthContext` and
 `localStorage` under `leafy_session`.
+
+Register takes an optional display name; it's stored in the Supabase user
+metadata (`display_name`) together with an optional avatar URL. The Profile
+page (menu item 05, or clicking your name in the sidebar) edits both via
+PUT to `/auth/v1/user`, and the context session updates in place.
 
 On page load `AuthContext` reads that key. If the access token is still
 valid it's reused. If it's expired or about to expire, the refresh token is
@@ -98,6 +105,7 @@ Routes:
 - `/feed/:postId/edit` - edit (author only)
 - `/create` - new entry (logged in)
 - `/my-posts` - own entries (logged in)
+- `/profile` - name and avatar (logged in)
 - `/login`, `/register` - guests only
 - `/about`
 - `*` - 404
@@ -131,12 +139,17 @@ Details loads the post and its comments in parallel, aborts on cleanup.
 Supabase, used as a backend-as-a-service. No custom server.
 
 **`posts`** columns: `id`, `post_type` (guide/question/showcase/tip),
-`author_name`, `title`, `description`, `image_url`, `plant_name`,
-`care_level`, `light_need`, `water_frequency`, `content`, `owner_id`,
-`created_at`.
+`author_name`, `author_avatar`, `title`, `description`, `image_url`,
+`plant_name`, `care_level`, `light_need`, `water_frequency`, `content`,
+`owner_id`, `created_at`.
 
-**`comments`** columns: `id`, `post_id`, `comment`, `owner_id`,
-`created_at`.
+**`comments`** columns: `id`, `post_id`, `comment`, `author_name`,
+`author_avatar`, `owner_id`, `created_at`.
+
+Entries and comments store the author's display name and avatar URL at
+writing time, so lists render without joins. Users without a custom avatar
+fall back to a neutral gray placeholder avatar; users without a display
+name fall back to the part of their email before the `@`.
 
 Both have RLS enabled. Policies:
 
@@ -153,8 +166,9 @@ The frontend talks to these tables via `/rest/v1/posts` and
 All four operations work on `posts`.
 
 **Create** - `/create` validates locally, then `POST /rest/v1/posts`.
-`owner_id` and `created_at` are filled by the database. Redirects to the
-new entry.
+`owner_id` and `created_at` are filled by the database. The row also stores
+the author's current display name and avatar URL. Redirects to the new
+entry.
 
 **Read** - feed uses paginated GET, details uses `?id=eq.{id}`, my-posts
 uses `?owner_id=eq.{userId}`.
@@ -165,20 +179,23 @@ isn't the owner.
 
 **Delete** - confirm dialog, then `DELETE /rest/v1/posts?id=eq.{id}`.
 Comments cascade. From the details page it redirects to `/feed`; in My
-Entries the tile disappears in place. Comments themselves can be deleted
-the same way (`DELETE /rest/v1/comments?id=eq.{id}`) by their author or
-an admin - the row disappears from the list in place.
+Entries the tile disappears in place. Comments themselves can be edited in
+place by their author (`PATCH /rest/v1/comments?id=eq.{id}`) and deleted
+the same way (`DELETE /rest/v1/comments?id=eq.{id}`) by their author or an
+admin - the row updates or disappears in the list in place.
 
 ## 8. Forms
 
-Register, Login, Create, Edit, and Comment. All controlled inputs with
-`useState`, all use `noValidate` and show per-field errors plus an API error
-block.
+Register, Login, Create, Edit, Comment, and Profile. All controlled
+inputs with `useState`, all use `noValidate` and show per-field errors plus
+an API error block.
 
 Validation:
 
 - Email - required, must match a basic email pattern
 - Password - required, 6+ characters on Register, confirm must match
+- Display name - optional; if given, 2–40 characters (Register + Profile)
+- Avatar URL - optional; must start with `http://` or `https://` if given
 - Title - 3–120 characters
 - Image URL - optional except for showcase; must start with `http://` or
   `https://` if present
@@ -186,7 +203,7 @@ Validation:
 - Plant name - required for guides and showcases, under 80 characters
 - Care fields (guide only) - care level and light required, watering
   required, content 30+ characters
-- Comment - required, max 500 characters
+- Comment - required, max 500 characters (create and edit)
 
 ## 9. React bits
 
@@ -203,8 +220,9 @@ doesn't double the posts. On unmount the `Feed` observer disconnects;
 in-flight fetches.
 
 Context - `AuthContext` exposes `user`, `accessToken`, `isAdmin`, `loading`,
-`signIn`, `signUp`, `signOut`. Used by Navbar, Sidebar, both route guards,
-the pages that read or write data, `CommentForm`, and `CommentList`.
+`signIn`, `signUp`, `signOut`, `updateProfile`. Used by Navbar, Sidebar,
+both route guards, the pages that read or write data, `CommentForm`,
+`CommentList`, and `ProfileForm`.
 `PostForm` stays presentational - Create and Edit own the state and pass
 handlers down.
 
@@ -215,7 +233,8 @@ Styling - plain CSS, four files: `tokens.css`, `base.css`,
 
 Land on Home. Click into the Feed. Filter by type. Open a post. Log in.
 Write an entry with the live preview form. Submit and land on the new
-entry. Comment on it. Check My Entries. Log out.
+entry. Comment on it. Open the Profile page, set a display name and
+avatar. Log out.
 
 ## 11. Edge cases
 

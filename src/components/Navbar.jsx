@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { profileName, profileAvatar } from "../lib/profile";
 
 const NAV_ITEMS = [
   { to: "/", label: "Home", num: "01", end: true },
@@ -31,9 +32,14 @@ export function NavLinks({ onNavigate }) {
         </NavLink>
       ))}
       {user && (
-        <NavLink to="/my-posts" className="sidebar-link" onClick={onNavigate}>
-          <span className="sidebar-link-num">04</span> My entries
-        </NavLink>
+        <>
+          <NavLink to="/my-posts" className="sidebar-link" onClick={onNavigate}>
+            <span className="sidebar-link-num">04</span> My entries
+          </NavLink>
+          <NavLink to="/profile" className="sidebar-link" onClick={onNavigate}>
+            <span className="sidebar-link-num">05</span> Profile
+          </NavLink>
+        </>
       )}
     </>
   );
@@ -158,7 +164,21 @@ function MobileDrawerContent({ onClose }) {
         {user ? (
           <>
             <span className="sidebar-label">Account</span>
-            <span className="sidebar-foot-email">{user.email}</span>
+            <Link to="/profile" className="sidebar-account" onClick={onClose}>
+              <img
+                className="avatar avatar-sm"
+                src={profileAvatar(user)}
+                alt=""
+                width="26"
+                height="26"
+              />
+              <span className="sidebar-account-id">
+                <span className="sidebar-account-name">
+                  {profileName(user)}
+                </span>
+                <span className="sidebar-foot-email">{user.email}</span>
+              </span>
+            </Link>
             <button onClick={handleLogout} className="btn btn-ghost btn-block">
               Log out
             </button>

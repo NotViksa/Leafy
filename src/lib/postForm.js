@@ -99,11 +99,12 @@ export function validatePost(form) {
   return errors;
 }
 
-export function toPayload(form, authorName) {
+export function toPayload(form, authorName, authorAvatar) {
   const f = fieldsFor(form.post_type);
   return {
     post_type: form.post_type,
     author_name: authorName,
+    author_avatar: authorAvatar || null,
     title: form.title.trim(),
     description: form.description.trim(),
     image_url: form.image_url.trim() || null,

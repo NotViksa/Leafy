@@ -3,6 +3,7 @@ import {
   signIn as apiSignIn,
   signUp as apiSignUp,
   signOut as apiSignOut,
+  updateProfile as apiUpdateProfile,
   refreshSession,
 } from "../api/auth";
 
@@ -79,13 +80,20 @@ export function AuthProvider({ children }) {
       setSession(next);
     },
 
-    async signUp(email, password) {
-      const res = await apiSignUp(email, password);
+    async signUp(email, password, displayName) {
+      const res = await apiSignUp(email, password, displayName);
       if (!res.access_token) return { needsConfirmation: true };
       const next = toSession(res);
       persist(next);
       setSession(next);
       return { needsConfirmation: false };
+    },
+
+    async updateProfile(data) {
+      const updatedUser = await apiUpdateProfile(data, session.access_token);
+      const next = { ...session, user: updatedUser };
+      persist(next);
+      setSession(next);
     },
 
     async signOut() {
