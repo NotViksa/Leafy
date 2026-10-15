@@ -40,19 +40,15 @@ export default function PostPreview({ form }) {
         <p className="preview-title">{form.title.trim() || "Untitled entry"}</p>
 
         {form.image_url.trim() && type !== "tip" && (
-        <Link to={`/feed/${post.id}`} className="post-image">
-          {post.image_url ? (
+          <div className="post-image">
             <img
-              src={post.image_url}
-              alt={post.title}
+              src={form.image_url}
+              alt={form.title}
               loading="lazy"
               width="1200"
               height="800"
             />
-          ) : (
-            <div className="post-image-empty">No image</div>
-          )}
-        </Link>
+          </div>
         )}
 
         {form.description.trim() && (

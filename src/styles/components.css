@@ -143,7 +143,7 @@
 .form-foot a { color: var(--sage-dark); border-bottom: 1px solid var(--sage); }
 .form-foot a:hover { color: var(--rust); border-color: var(--rust); }
 
-/* Tags — unified badge system */
+/* Tags - unified badge system */
 .care, .type {
   padding: 2px 7px;
   border-radius: var(--radius-sm);

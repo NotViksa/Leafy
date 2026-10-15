@@ -80,7 +80,7 @@ export default function PostForm({
               placeholder="https://…"
               hint={
                 f.imageRequired
-                  ? "Required for a showcase — the full image is shown, never cropped."
+                  ? "Required for a showcase - the full image is shown, never cropped."
                   : "The full image is shown, never cropped."
               }
               error={errors.image_url}
@@ -171,7 +171,7 @@ function placeholderFor(type, field) {
   }
   return {
     guide: "One or two sentences that appear on the feed card.",
-    question: "Give context — pot, light, watering, how long this has been happening.",
+    question: "Give context - pot, light, watering, how long this has been happening.",
     showcase: "A few words about the photo.",
     tip: "A short piece of advice.",
   }[type] ?? "";

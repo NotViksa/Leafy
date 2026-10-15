@@ -26,8 +26,8 @@ export default function Feed() {
     setSearchParams(next, { replace: true });
   }, [debouncedSearch, typeFilter, urlQuery, setSearchParams]);
 
-const { posts, loading, error, loadMore, hasLoadedOnce } =
-  useInfinitePosts(typeFilter || null, urlQuery || null);
+  const { posts, loading, error, loadMore, hasLoadedOnce } =
+    useInfinitePosts(typeFilter || null, urlQuery || null);
 
   const sentinelRef = useRef(null);
 
@@ -53,7 +53,7 @@ const { posts, loading, error, loadMore, hasLoadedOnce } =
     setSearchParams(next);
   }
 
-const isInitialLoad = loading && !hasLoadedOnce;
+  const isInitialLoad = loading && !hasLoadedOnce;
   const isEmpty = !loading && posts.length === 0 && !error;
 
   return (

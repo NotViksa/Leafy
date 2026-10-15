@@ -8,6 +8,12 @@ const NAV_ITEMS = [
   { to: "/about", label: "About", num: "03" },
 ];
 
+const DATE_STAMP = new Date().toLocaleDateString("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+
 export function NavLinks({ onNavigate }) {
   const { user } = useAuth();
   return (
@@ -53,10 +59,8 @@ function SprigMark({ size = 22 }) {
 }
 
 export default function Navbar() {
-  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [progress, setProgress] = useState(0);
   const hiddenRef = useRef(false);
 
   useEffect(() => {
@@ -65,8 +69,6 @@ export default function Navbar() {
 
     function update() {
       const y = window.scrollY;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(max > 0 ? Math.min(1, y / max) : 0);
 
       let nextHidden = hiddenRef.current;
       if (y > 120 && y > lastY + 6) nextHidden = true;
@@ -93,12 +95,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const dateStamp = new Date().toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-
   return (
     <>
       <header className={`navbar ${hidden && !open ? "navbar-hidden" : ""}`}>
@@ -122,7 +118,7 @@ export default function Navbar() {
           </Link>
 
           <div className="navbar-stamp" aria-hidden="true">
-            Vol. 01 · {dateStamp}
+            Vol. 01 · {DATE_STAMP}
           </div>
         </div>
       </header>

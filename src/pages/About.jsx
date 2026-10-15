@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 
+const DATE_STAMP = new Date().toLocaleDateString("en-GB", {
+  day: "2-digit",
+  month: "long",
+  year: "numeric",
+});
+
 export default function About() {
-  const date = new Date().toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
 
   return (
     <article className="about">
@@ -60,7 +61,7 @@ export default function About() {
               </div>
               <div>
                 <dt>Issue</dt>
-                <dd>{date}</dd>
+                <dd>{DATE_STAMP}</dd>
               </div>
               <div>
                 <dt>Frontend</dt>

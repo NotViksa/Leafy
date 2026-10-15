@@ -29,7 +29,7 @@ const DESCRIPTION_LABELS = {
 
 const DESCRIPTION_HINTS = {
   guide:    "Shown on the feed card, clamped to 3 lines.",
-  question: "Ask clearly — what do you want to know?",
+  question: "Ask clearly - what do you want to know?",
   showcase: "A few words about the photo or the plant.",
   tip:      "Keep it short and useful.",
 };

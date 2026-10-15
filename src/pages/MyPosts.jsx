@@ -131,21 +131,21 @@ export default function MyPosts() {
         />
       )}
 
-{!loading && posts.length > 0 && filtered.length === 0 && (
-  <EmptyState
-    kicker="No matches"
-    title={
-      debouncedSearch.trim()
-        ? `Nothing matches “${debouncedSearch.trim()}”.`
-        : "Nothing under this filter."
-    }
-    message={
-      debouncedSearch.trim()
-        ? "Try a different word, or clear the search."
-        : "You have not written any entries of this type yet."
-    }
-  />
-)}
+      {!loading && posts.length > 0 && filtered.length === 0 && (
+        <EmptyState
+          kicker="No matches"
+          title={
+            debouncedSearch.trim()
+              ? `Nothing matches “${debouncedSearch.trim()}”.`
+              : "Nothing under this filter."
+          }
+          message={
+            debouncedSearch.trim()
+              ? "Try a different word, or clear the search."
+              : "You have not written any entries of this type yet."
+          }
+        />
+      )}
 
       {!loading && filtered.length > 0 && (
         <div className="entry-grid">

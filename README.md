@@ -31,7 +31,7 @@ schema and policies are in the Functional Guide below. Set the Site URL to
 
 ## Stack
 
-React 18 + Vite + React Router. Backend is Supabase (Postgres + Auth +
+React 19 + Vite + React Router 7. Backend is Supabase (Postgres + Auth +
 REST). Plain CSS in four files. No frameworks on top of that.
 
 ## Structure
@@ -41,7 +41,7 @@ src/
 ├── api/         Supabase REST calls
 ├── components/  layout, navbar, cards, forms, guards, states
 ├── context/     AuthContext
-├── hooks/       useInfinitePosts
+├── hooks/       useInfinitePosts, useDebouncedValue
 ├── lib/         postForm (validation + payload helpers)
 ├── pages/       Home, Feed, Details, Create, Edit, MyPosts, Login,
 │                Register, About, NotFound
@@ -82,8 +82,8 @@ valid it's reused. If it's expired or about to expire, the refresh token is
 exchanged for a new session. If that fails, the session is cleared and the
 user is treated as a guest.
 
-Logout posts to Supabase's logout endpoint and clears both Context and
-localStorage. Passwords are never stored.
+Logout posts to Supabase's logout endpoint (`scope=local`) and clears
+both Context and localStorage. Passwords are never stored.
 
 ## 4. Routing
 
@@ -99,9 +99,11 @@ Routes:
 - `/about`
 - `*` - 404
 
-`ProtectedRoute` redirects guests to `/login`. `GuestRoute` redirects
-logged-in users to `/`. Both wait for the auth session to finish loading
-before deciding, so a refresh doesn't bounce you to login.
+`ProtectedRoute` redirects guests to `/login` and remembers where they
+were headed; after a successful login they land back on that route.
+`GuestRoute` redirects logged-in users to `/`. Both wait for the auth
+session to finish loading before deciding, so a refresh doesn't bounce
+you to login.
 
 `Layout` wraps the main pages with Navbar, Sidebar, and Footer. `AuthLayout`
 wraps only Login and Register.
@@ -115,7 +117,9 @@ counter so it scrolls forever. A `Set` of keys prevents duplicate appends
 if two fetches race.
 
 Filter tabs write to the URL (`?type=guide`), so a filtered feed is
-shareable and survives refresh.
+shareable and survives refresh. The search box works the same way: it's
+debounced 350 ms, matches title and description server-side (`ilike`),
+and syncs to `?q=`.
 
 Details loads the post and its comments in parallel, aborts on cleanup.
 
@@ -156,7 +160,8 @@ uses `?owner_id=eq.{userId}`.
 isn't the owner.
 
 **Delete** - confirm dialog, then `DELETE /rest/v1/posts?id=eq.{id}`.
-Comments cascade. Redirects to `/feed`.
+Comments cascade. From the details page it redirects to `/feed`; in My
+Entries the tile disappears in place.
 
 ## 8. Forms
 
@@ -172,8 +177,10 @@ Validation:
 - Image URL - optional except for showcase; must start with `http://` or
   `https://` if present
 - Description - 10–500 characters
+- Plant name - required for guides and showcases, under 80 characters
 - Care fields (guide only) - care level and light required, watering
   required, content 30+ characters
+- Comment - required, max 500 characters
 
 ## 9. React bits
 
@@ -182,13 +189,17 @@ Hooks used: `useState`, `useEffect`, `useRef`, `useContext`, `useCallback`,
 `useSearchParams`).
 
 Mount / update / unmount example - `useInfinitePosts`. On mount it resets
-refs and fetches page 1. When the filter changes it clears posts and
-refetches. On unmount, an `AbortController` cancels the in-flight request
-and the observer in `Feed` disconnects.
+refs and fetches page 1. When the filter or search changes it resets and
+refetches. A generation counter discards stale responses, so an older
+slow request can't overwrite a newer list, and StrictMode's double mount
+doesn't double the posts. On unmount the `Feed` observer disconnects;
+`Details`, `Edit`, and `MyPosts` use an `AbortController` to cancel
+in-flight fetches.
 
 Context - `AuthContext` exposes `user`, `accessToken`, `loading`, `signIn`,
-`signUp`, `signOut`. Used by Navbar, Sidebar, both guards, PostForm,
-CommentForm, Details, and MyPosts.
+`signUp`, `signOut`. Used by Navbar, Sidebar, both route guards, the pages
+that read or write data, and `CommentForm`. `PostForm` stays presentational
+- Create and Edit own the state and pass handlers down.
 
 Styling - plain CSS, four files: `tokens.css`, `base.css`,
 `components.css`, `pages.css`.

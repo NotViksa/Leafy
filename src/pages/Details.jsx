@@ -33,14 +33,11 @@ export default function Details() {
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
-  
 
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    setHasLoaded(true);
     setError("");
-    
 
     Promise.all([
       getPostById(postId, controller.signal),
@@ -55,7 +52,10 @@ export default function Details() {
         setError(err.message || "Could not load post");
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+          setHasLoaded(true);
+        }
       });
 
     return () => controller.abort();

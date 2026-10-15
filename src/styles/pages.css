@@ -145,6 +145,7 @@
   line-height: 1.6;
   margin-bottom: 14px;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -521,6 +522,7 @@
   color: var(--ink-soft);
   line-height: 1.5;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -912,6 +914,7 @@
   line-height: 1.5;
   color: var(--ink-soft);
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -1000,7 +1003,7 @@
 }
 
 /* ============================================================
-   Responsive — larger first, smaller last
+   Responsive - larger first, smaller last
    ============================================================ */
 @media (max-width: 1024px) {
   .editor-grid { grid-template-columns: 1fr; gap: 32px; }
