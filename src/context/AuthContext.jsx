@@ -69,6 +69,7 @@ export function AuthProvider({ children }) {
   const value = {
     user: session?.user ?? null,
     accessToken: session?.access_token ?? null,
+    isAdmin: session?.user?.app_metadata?.role === "admin",
     loading,
 
     async signIn(email, password) {

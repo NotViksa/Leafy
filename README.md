@@ -69,7 +69,10 @@ specific houseplants alive, and to read what others have figured out.
 posts and comments but can't write anything.
 
 **Logged-in users** get everything above plus Create, My Posts, and Edit
-on their own entries.
+on their own entries. Comment authors can delete their own comments.
+
+**Admins** (accounts with `role = admin` in Supabase `app_metadata`) can
+delete any entry or comment from the details page.
 
 ## 3. Auth
 
@@ -138,8 +141,9 @@ Supabase, used as a backend-as-a-service. No custom server.
 Both have RLS enabled. Policies:
 
 - `posts`: public read; insert/update/delete allowed only when
-  `owner_id = auth.uid()`
-- `comments`: public read; insert allowed when `owner_id = auth.uid()`
+  `owner_id = auth.uid()`; admins can also delete
+- `comments`: public read; insert allowed when `owner_id = auth.uid()`;
+  owners and admins can delete
 
 The frontend talks to these tables via `/rest/v1/posts` and
 `/rest/v1/comments` using the publishable key plus the user's access token.
@@ -161,7 +165,9 @@ isn't the owner.
 
 **Delete** - confirm dialog, then `DELETE /rest/v1/posts?id=eq.{id}`.
 Comments cascade. From the details page it redirects to `/feed`; in My
-Entries the tile disappears in place.
+Entries the tile disappears in place. Comments themselves can be deleted
+the same way (`DELETE /rest/v1/comments?id=eq.{id}`) by their author or
+an admin - the row disappears from the list in place.
 
 ## 8. Forms
 
@@ -196,10 +202,11 @@ doesn't double the posts. On unmount the `Feed` observer disconnects;
 `Details`, `Edit`, and `MyPosts` use an `AbortController` to cancel
 in-flight fetches.
 
-Context - `AuthContext` exposes `user`, `accessToken`, `loading`, `signIn`,
-`signUp`, `signOut`. Used by Navbar, Sidebar, both route guards, the pages
-that read or write data, and `CommentForm`. `PostForm` stays presentational
-- Create and Edit own the state and pass handlers down.
+Context - `AuthContext` exposes `user`, `accessToken`, `isAdmin`, `loading`,
+`signIn`, `signUp`, `signOut`. Used by Navbar, Sidebar, both route guards,
+the pages that read or write data, `CommentForm`, and `CommentList`.
+`PostForm` stays presentational - Create and Edit own the state and pass
+handlers down.
 
 Styling - plain CSS, four files: `tokens.css`, `base.css`,
 `components.css`, `pages.css`.

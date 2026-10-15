@@ -24,7 +24,7 @@ const COMMENT_HEADINGS = {
 
 export default function Details() {
   const { postId } = useParams();
-  const { user, accessToken } = useAuth();
+  const { user, accessToken, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
@@ -65,7 +65,12 @@ export default function Details() {
     if (!confirm("Delete this entry? This cannot be undone.")) return;
     setDeleting(true);
     try {
-      await deletePost(post.id, accessToken);
+      const deleted = await deletePost(post.id, accessToken);
+      if (!deleted) {
+        setError("Could not delete post");
+        setDeleting(false);
+        return;
+      }
       navigate("/feed", { replace: true });
     } catch (err) {
       setError(err.message || "Could not delete post");
@@ -75,6 +80,10 @@ export default function Details() {
 
   function handleCommentAdded(newComment) {
     setComments((prev) => [...prev, newComment]);
+  }
+
+  function handleCommentDeleted(id) {
+    setComments((prev) => prev.filter((c) => c.id !== id));
   }
 
 if (loading && !hasLoaded) return <DetailsSkeleton />;
@@ -147,9 +156,11 @@ if (!post) {
 
       {post.content && <div className="details-content">{post.content}</div>}
 
-      {isOwner && (
+      {(isOwner || isAdmin) && (
         <div className="details-owner">
-          <Link to={`/feed/${post.id}/edit`} className="btn btn-ghost">Edit entry</Link>
+          {isOwner && (
+            <Link to={`/feed/${post.id}/edit`} className="btn btn-ghost">Edit entry</Link>
+          )}
           <button onClick={handleDelete} className="btn btn-danger" disabled={deleting}>
             {deleting ? "Deleting…" : "Delete"}
           </button>
@@ -161,7 +172,7 @@ if (!post) {
           {COMMENT_HEADINGS[type]} <span>{comments.length} total</span>
         </h2>
 
-        <CommentList comments={comments} />
+        <CommentList comments={comments} onDeleted={handleCommentDeleted} />
 
         {user ? (
           <CommentForm postId={post.id} onAdded={handleCommentAdded} />

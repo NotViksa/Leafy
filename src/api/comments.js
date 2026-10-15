@@ -20,3 +20,13 @@ export async function createComment({ post_id, comment }, token) {
   const data = await handleResponse(response);
   return data?.[0] ?? null;
 }
+
+export async function deleteComment(id, token) {
+  const url = tableUrl("comments", { id: `eq.${id}` });
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: { ...authHeaders(token), Prefer: "return=representation" },
+  });
+  const data = await handleResponse(response);
+  return data?.[0] ?? null;
+}
