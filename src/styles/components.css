@@ -448,6 +448,14 @@
   .empty-state-title { font-size: 20px; }
 }
 
+.error-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
 /* Search */
 .search-bar {
   margin: 20px 0 24px;

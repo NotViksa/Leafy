@@ -39,7 +39,7 @@ REST). Plain CSS in four files. No frameworks on top of that.
 ```
 src/
 ├── api/         Supabase REST calls
-├── components/  layout, navbar, cards, forms, guards, states
+├── components/  layout, navbar, cards, forms, guards, states, error boundary
 ├── context/     AuthContext
 ├── hooks/       useInfinitePosts, useDebouncedValue
 ├── lib/         postForm + profile (validation, payload, display name/avatar helpers)
@@ -226,6 +226,11 @@ both route guards, the pages that read or write data, `CommentForm`,
 `PostForm` stays presentational - Create and Edit own the state and pass
 handlers down.
 
+`ErrorBoundary` is the one class component: `getDerivedStateFromError`
+swaps in a fallback card when a page throws during render, and
+`componentDidCatch` logs the error. The navbar and sidebar stay usable,
+and the boundary resets on route change or "Try again".
+
 Styling - plain CSS, four files: `tokens.css`, `base.css`,
 `components.css`, `pages.css`.
 
@@ -246,3 +251,5 @@ avatar. Log out.
 - Feed skeletons while loading, details skeleton while loading
 - Duplicate keys guarded with a Set in the infinite scroll hook
 - A 401 mid-session clears the stored session on next refresh
+- A route-level `ErrorBoundary` catches a crashing page and shows a
+  fallback with "Try again" while the navbar and sidebar keep working

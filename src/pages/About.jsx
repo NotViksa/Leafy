@@ -7,7 +7,6 @@ const DATE_STAMP = new Date().toLocaleDateString("en-GB", {
 });
 
 export default function About() {
-
   return (
     <article className="about">
       <header className="about-head">
