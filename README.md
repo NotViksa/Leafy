@@ -3,7 +3,7 @@
 A houseplant community site. People write care guides, ask questions, show
 off plants, or post quick tips. It's styled like a field journal.
 
-Live: WIP
+Live: https://leafy-viksa1.vercel.app
 
 Repo: https://github.com/NotViksa/Leafy
 
