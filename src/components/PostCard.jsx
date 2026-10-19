@@ -1,11 +1,5 @@
 import { Link } from "react-router-dom";
-
-const TYPE_LABELS = {
-  guide: "Guide",
-  question: "Question",
-  showcase: "Showcase",
-  tip: "Tip",
-};
+import { POST_TYPE_LABELS, entryNumber } from "../lib/postForm";
 
 const CTA_LABELS = {
   guide: "Read the guide",
@@ -14,21 +8,17 @@ const CTA_LABELS = {
   tip: "Read the tip",
 };
 
-function formatNum(id) {
-  return String(id).padStart(3, "0");
-}
-
 export default function PostCard({ post }) {
   const type = post.post_type ?? "guide";
   const showImage = post.image_url && type !== "tip";
 
   return (
     <article className={`post post-type-${type}`}>
-      <div className="post-num">N°{formatNum(post.id)}</div>
+      <div className="post-num">N°{entryNumber(post.id)}</div>
 
       <div className="post-body">
         <div className="post-meta">
-          <span className={`type type-${type}`}>{TYPE_LABELS[type]}</span>
+          <span className={`type type-${type}`}>{POST_TYPE_LABELS[type]}</span>
           {post.care_level && (
             <span className={`care care-${post.care_level}`}>{post.care_level}</span>
           )}
@@ -42,8 +32,7 @@ export default function PostCard({ post }) {
         </h2>
 
         {showImage && (
-        <Link to={`/feed/${post.id}`} className="post-image">
-          {post.image_url ? (
+          <Link to={`/feed/${post.id}`} className="post-image">
             <img
               src={post.image_url}
               alt={post.title}
@@ -51,10 +40,7 @@ export default function PostCard({ post }) {
               width="1200"
               height="800"
             />
-          ) : (
-            <div className="post-image-empty">No image</div>
-          )}
-        </Link>
+          </Link>
         )}
 
         <p className="post-desc">{post.description}</p>

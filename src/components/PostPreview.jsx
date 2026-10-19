@@ -1,9 +1,4 @@
-const TYPE_LABELS = {
-  guide: "Guide",
-  question: "Question",
-  showcase: "Showcase",
-  tip: "Tip",
-};
+import { POST_TYPE_LABELS } from "../lib/postForm";
 
 export default function PostPreview({ form }) {
   const type = form.post_type ?? "guide";
@@ -25,7 +20,7 @@ export default function PostPreview({ form }) {
       <span className="preview-label">Live preview</span>
       <div className="preview-card">
         <div className="preview-meta">
-          <span className={`type type-${type}`}>{TYPE_LABELS[type]}</span>
+          <span className={`type type-${type}`}>{POST_TYPE_LABELS[type]}</span>
           {type === "guide" && (
             <>
               <span className={`care care-${form.care_level}`}>{form.care_level}</span>

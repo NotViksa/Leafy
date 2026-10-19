@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../context/useAuth";
 import { useToast } from "../context/useToast";
 import { createComment } from "../api/comments";
-import { COMMENT_MAX_LEN } from "../lib/comments";
+import { COMMENT_MAX_LEN, validateCommentText } from "../lib/comments";
 import { profileName, profileAvatar } from "../lib/profile";
 
 export default function CommentForm({ postId, onAdded }) {
@@ -16,15 +16,12 @@ export default function CommentForm({ postId, onAdded }) {
     e.preventDefault();
     setError("");
 
+    const invalid = validateCommentText(text);
+    if (invalid) {
+      setError(invalid);
+      return;
+    }
     const trimmed = text.trim();
-    if (!trimmed) {
-      setError("Comment cannot be empty.");
-      return;
-    }
-    if (trimmed.length > COMMENT_MAX_LEN) {
-      setError(`Comment is too long (max ${COMMENT_MAX_LEN} characters).`);
-      return;
-    }
 
     setSubmitting(true);
     try {

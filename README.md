@@ -5,7 +5,11 @@ and tips; the UI is styled like a botanist's field notebook.
 
 Live: https://leafy-viksa1.vercel.app · Repo: https://github.com/NotViksa/Leafy
 
+Demo admin: `admin@leafy.app` / `leafyadmin123` - log in with it to try the
+moderation role (can delete any entry or comment; editing stays author-only).
+
 ## Run locally
+
 ```bash
 npm install
 cp .env.example .env.local   # Windows: copy .env.example .env.local
@@ -26,15 +30,18 @@ section 6, and turn "Confirm email" off. Scripts: `npm run build`, `npm run lint
 plain CSS in four files. **Source:** `src/api`, `components`, `context`, `hooks`, `lib`, `pages`, `styles`; routes in `App.jsx`.
 
 # Functional Guide
+
 ## 1. Project overview
+
 **Name:** Leafy · **Category:** Community blog / journal for houseplant care
 
 **Purpose:** Record what works when keeping plants alive and read what other
 growers have learned. Entries are typed as guides, questions, showcases, or tips.
 
 ## 2. User access & permissions
+
 - **Guest:** Home (`/`), Feed (`/feed`), Details (`/feed/:postId`), About, Login,
-  Register — read-only. Published entries and comments are fetched from
+  Register - read-only. Published entries and comments are fetched from
   Supabase; every write action requires an account.
 - **Authenticated:** adds Create (`/create`), My entries (`/my-posts`), Profile
   (`/profile`), and Edit (`/feed/:postId/edit`, author only); can post comments
@@ -44,6 +51,7 @@ growers have learned. Entries are typed as guides, questions, showcases, or tips
   successful actions show a toast.
 
 ## 3. Authentication & session handling
+
 Register/Login call Supabase Auth. On success the session (tokens + user) lives
 in `AuthContext` and `localStorage` (`leafy_session`). On load, an expired access
 token is refreshed with the refresh token; if that fails the session is cleared.
@@ -53,8 +61,9 @@ editable on `/profile` via `PUT /auth/v1/user`, and snapshotted onto entries and
 comments when written.
 
 ## 4. Routing structure
+
 Eleven routes: `/`, `/feed`, `/feed/:postId`, `/about`, `/login`, `/register`,
-`/create`*, `/my-posts`*, `/profile`*, `/feed/:postId/edit`*, `*` (404).
+`/create`_, `/my-posts`_, `/profile`_, `/feed/:postId/edit`_, `*` (404).
 `*` = authenticated.
 
 - `ProtectedRoute` sends guests to `/login` and returns them afterwards;
@@ -65,6 +74,7 @@ Eleven routes: `/`, `/feed`, `/feed/:postId`, `/about`, `/login`, `/register`,
   My entries are the dynamic pages.
 
 ## 5. List → details flow
+
 - **Feed (catalog):** six posts per page, newest first, via `GET /posts`.
   Infinite scroll uses an `IntersectionObserver` and loops when the database
   runs out. Tabs write `?type=`; debounced search writes `?q=` and matches
@@ -75,6 +85,7 @@ Eleven routes: `/`, `/feed`, `/feed/:postId`, `/about`, `/login`, `/register`,
   search.
 
 ## 6. Data source & backend
+
 Supabase BaaS; no custom server. `fetch` sends the publishable key plus the
 user's token.
 
@@ -87,6 +98,7 @@ RLS: public read on both; posts insert/update/delete only when
 owner or admin; admins may delete posts.
 
 ## 7. Data operations (CRUD)
+
 - **Create:** `/create` validates, then `POST /posts` with the author snapshot;
   the database supplies `id`, `owner_id`, `created_at`. Redirects to the entry.
 - **Read:** paginated feed GET, `?id=eq.` for Details, `?owner_id=eq.` for My entries.
@@ -96,7 +108,8 @@ owner or admin; admins may delete posts.
   Comments update/delete in place by their author (delete also by admins).
 
 ## 8. Forms & validation
-Register, Login, Create, Edit, Comment, Profile — controlled inputs, synthetic
+
+Register, Login, Create, Edit, Comment, Profile - controlled inputs, synthetic
 events, `noValidate`, per-field errors, API error blocks, loading labels.
 
 - **Title:** required, 3–120 characters. **Description:** required, 10–500.
@@ -107,6 +120,7 @@ events, `noValidate`, per-field errors, API error blocks, loading labels.
   **profile:** display name 2–40 characters, avatar URL must be http(s).
 
 ## 9. React-specific techniques
+
 - **Hooks:** `useState`, `useEffect`, `useRef`, `useContext`, `useCallback`,
   `useMemo`, plus `useParams`, `useNavigate`, `useLocation`, `useSearchParams`.
 - **Lifecycle:** `useInfinitePosts` fetches page one on mount, resets on
@@ -116,7 +130,9 @@ events, `noValidate`, per-field errors, API error blocks, loading labels.
   `ToastContext` (notifier), consumed across guards, nav, forms, and pages.
 - **Styling:** plain external CSS (`tokens`, `base`, `components`, `pages`);
   `ErrorBoundary` is the only class component and resets per route.
+
 ## 10. Typical user flow
+
 1. Land on Home, open the Feed, filter or search.
 2. Open an entry; log in if needed.
 3. Publish a new entry via the live-preview form.
@@ -124,6 +140,7 @@ events, `noValidate`, per-field errors, API error blocks, loading labels.
 5. Update the profile, then log out.
 
 ## 11. Error & edge-case handling
+
 - API/network errors show inline with `role="alert"`; successful mutations toast.
 - Missing post IDs show a 404 state; empty feed/filter/search/My entries show
   `EmptyState`.

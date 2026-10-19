@@ -5,16 +5,9 @@ import { useToast } from "../context/useToast";
 import { getPostsByOwner, deletePost } from "../api/posts";
 import EmptyState from "../components/EmptyState";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { POST_TYPES } from "../lib/postForm";
+import { POST_TYPE_LABELS, POST_TYPES, entryNumber } from "../lib/postForm";
 import SearchBar from "../components/SearchBar";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
-
-const TYPE_LABELS = {
-  guide: "Guide",
-  question: "Question",
-  showcase: "Showcase",
-  tip: "Tip",
-};
 
 const FILTERS = [{ value: "", label: "All" }, ...POST_TYPES];
 
@@ -188,14 +181,14 @@ function MyPostsView({ user }) {
 
 function EntryTile({ post, onDelete }) {
   const type = post.post_type ?? "guide";
-  const num = String(post.id).padStart(3, "0");
+  const num = entryNumber(post.id);
 
   return (
     <article className={`entry-tile entry-tile-${type}`}>
       <span className="entry-tile-ghost" aria-hidden="true">{num}</span>
 
       <header className="entry-tile-head">
-        <span className={`type type-${type}`}>{TYPE_LABELS[type]}</span>
+        <span className={`type type-${type}`}>{POST_TYPE_LABELS[type]}</span>
       </header>
 
       <h3 className="entry-tile-title">

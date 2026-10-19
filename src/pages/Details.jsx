@@ -10,13 +10,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import EmptyState from "../components/EmptyState";
 import { DetailsSkeleton } from "../components/Skeleton";
 import { DEFAULT_AVATAR } from "../lib/profile";
-
-const TYPE_LABELS = {
-  guide: "Guide",
-  question: "Question",
-  showcase: "Showcase",
-  tip: "Tip",
-};
+import { POST_TYPE_LABELS, entryNumber } from "../lib/postForm";
 
 const COMMENT_HEADINGS = {
   guide: "Annotations",
@@ -118,7 +112,7 @@ function DetailsView({ postId }) {
 
   const type = post.post_type ?? "guide";
   const isOwner = user && post.owner_id === user.id;
-  const entryNum = String(post.id).padStart(3, "0");
+  const entryNum = entryNumber(post.id);
   const isGuide = type === "guide";
 
   return (
@@ -127,7 +121,7 @@ function DetailsView({ postId }) {
 
       <header className="details-head">
         <p className="details-kicker">
-          {TYPE_LABELS[type]} · N°{entryNum}
+          {POST_TYPE_LABELS[type]} · N°{entryNum}
         </p>
         <h1 className="details-title">{post.title}</h1>
         {post.plant_name && <p className="details-plant">{post.plant_name}</p>}

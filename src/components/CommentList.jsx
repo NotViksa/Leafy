@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../context/useAuth";
 import { useToast } from "../context/useToast";
 import { deleteComment, updateComment } from "../api/comments";
-import { COMMENT_MAX_LEN } from "../lib/comments";
+import { COMMENT_MAX_LEN, validateCommentText } from "../lib/comments";
 import { DEFAULT_AVATAR } from "../lib/profile";
 import ConfirmDialog from "./ConfirmDialog";
 
@@ -43,15 +43,12 @@ export default function CommentList({ comments, onDeleted, onUpdated }) {
   }
 
   async function handleSave(comment) {
+    const invalid = validateCommentText(draft);
+    if (invalid) {
+      setError(invalid);
+      return;
+    }
     const trimmed = draft.trim();
-    if (!trimmed) {
-      setError("Comment cannot be empty.");
-      return;
-    }
-    if (trimmed.length > COMMENT_MAX_LEN) {
-      setError(`Comment is too long (max ${COMMENT_MAX_LEN} characters).`);
-      return;
-    }
 
     setSavingId(comment.id);
     setError("");

@@ -503,23 +503,6 @@
   letter-spacing: -0.02em;
   color: var(--ink);
 }
-.preview-img {
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-sm);
-  background: var(--paper-2);
-  padding: 6px;
-  max-height: 160px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.preview-img img {
-  max-height: 148px;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
 .preview-desc {
   font-size: 12px;
   color: var(--ink-soft);

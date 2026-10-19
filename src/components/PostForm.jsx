@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import PostPreview from "./PostPreview";
+import { FormSectionHead, FormField } from "./FormElements";
 import {
   POST_TYPES,
   CARE_LEVELS,
@@ -37,7 +38,7 @@ export default function PostForm({
           {apiError && <p className="form-error" role="alert">{apiError}</p>}
 
           <section className="editor-section">
-            <SectionHead num="I." title="Type" />
+            <FormSectionHead num="I." title="Type" />
             <div className="type-tabs">
               {POST_TYPES.map((t) => (
                 <button
@@ -55,8 +56,8 @@ export default function PostForm({
           </section>
 
           <section className="editor-section">
-            <SectionHead num="II." title="Identity" />
-            <Field
+            <FormSectionHead num="II." title="Identity" />
+            <FormField
               id="title"
               label="Title"
               value={form.title}
@@ -64,7 +65,7 @@ export default function PostForm({
               placeholder={placeholderFor(form.post_type, "title")}
               error={errors.title}
             />
-            <Field
+            <FormField
               id="plant_name"
               label={f.plant ? "Plant name" : "Plant name (optional)"}
               value={form.plant_name}
@@ -72,7 +73,7 @@ export default function PostForm({
               placeholder="Monstera Deliciosa"
               error={errors.plant_name}
             />
-            <Field
+            <FormField
               id="image_url"
               label={f.imageRequired ? "Image URL" : "Image URL (optional)"}
               value={form.image_url}
@@ -89,7 +90,7 @@ export default function PostForm({
 
           {f.care && (
             <section className="editor-section">
-              <SectionHead num="III." title="Care" />
+              <FormSectionHead num="III." title="Care" />
               <div className="editor-row-3">
                 <Select
                   id="care_level"
@@ -107,7 +108,7 @@ export default function PostForm({
                   options={LIGHT_NEEDS}
                   error={errors.light_need}
                 />
-                <Field
+                <FormField
                   id="water_frequency"
                   label="Watering"
                   value={form.water_frequency}
@@ -120,7 +121,7 @@ export default function PostForm({
           )}
 
           <section className="editor-section">
-            <SectionHead num={f.care ? "IV." : "III."} title="Content" />
+            <FormSectionHead num={f.care ? "IV." : "III."} title="Content" />
             <Textarea
               id="description"
               label={descriptionLabel(form.post_type)}
@@ -175,26 +176,6 @@ function placeholderFor(type, field) {
     showcase: "A few words about the photo.",
     tip: "A short piece of advice.",
   }[type] ?? "";
-}
-
-function SectionHead({ num, title }) {
-  return (
-    <div className="editor-section-head">
-      <span className="editor-section-num">{num}</span>
-      <span className="editor-section-title">{title}</span>
-    </div>
-  );
-}
-
-function Field({ id, label, value, onChange, placeholder, hint, error }) {
-  return (
-    <div className="editor-field">
-      <label htmlFor={id}>{label}</label>
-      <input id={id} name={id} value={value} onChange={onChange} placeholder={placeholder} />
-      {hint && <span className="editor-field-foot"><span>{hint}</span></span>}
-      {error && <span className="field-error">{error}</span>}
-    </div>
-  );
 }
 
 function Select({ id, label, value, onChange, options, error }) {

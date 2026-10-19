@@ -164,21 +164,6 @@ h1, h2, h3, h4 {
   white-space: nowrap;
 }
 
-.navbar-auth {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.navbar-user {
-  color: var(--ink-mute);
-  font-size: 12px;
-  font-family: var(--sans);
-  letter-spacing: 0.02em;
-}
-
 /* Sidebar */
 .sidebar {
   padding: 44px 0 24px;
@@ -356,19 +341,11 @@ html[data-nav="hidden"] .sidebar {
   .navbar-brand-word { font-size: 17px; }
   .navbar-brand-tag { display: none; }
   .navbar-brand-mark { width: 28px; height: 28px; }
-  .navbar-auth .btn-ghost { display: none; }
   .footer { padding: 24px; }
 }
 
 @media (max-width: 640px) {
   .navbar-inner { padding: 0 16px; gap: 8px; }
-  .navbar-user {
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .navbar-auth .btn-primary { padding: 7px 12px; font-size: 12px; }
 
   .app-body { padding: 0 16px; }
   .app-main { padding: 24px 0 60px; }

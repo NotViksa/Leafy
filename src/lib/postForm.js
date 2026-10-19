@@ -8,6 +8,17 @@ export const POST_TYPES = [
 export const CARE_LEVELS = ["easy", "medium", "expert"];
 export const LIGHT_NEEDS = ["low", "medium", "bright"];
 
+export const POST_TYPE_LABELS = {
+  guide: "Guide",
+  question: "Question",
+  showcase: "Showcase",
+  tip: "Tip",
+};
+
+export function entryNumber(id) {
+  return String(id).padStart(3, "0");
+}
+
 export const EMPTY_POST = {
   post_type: "guide",
   title: "",
@@ -45,7 +56,6 @@ export function descriptionHint(type) {
 export function fieldsFor(type) {
   return {
     plant: type === "guide" || type === "showcase",
-    plantOptional: type === "question" || type === "tip",
     care: type === "guide",
     content: type === "guide",
     imageRequired: type === "showcase",

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/useAuth";
 import ProfilePreview from "./ProfilePreview";
+import { FormSectionHead, FormField } from "./FormElements";
 import { profileName } from "../lib/profile";
 
 const MAX_NAME = 40;
@@ -71,8 +72,8 @@ export default function ProfileForm() {
           {apiError && <p className="form-error" role="alert">{apiError}</p>}
 
           <section className="editor-section">
-            <SectionHead num="I." title="Identity" />
-            <Field
+            <FormSectionHead num="I." title="Identity" />
+            <FormField
               id="profile-name"
               label="Display name"
               value={name}
@@ -84,8 +85,8 @@ export default function ProfileForm() {
           </section>
 
           <section className="editor-section">
-            <SectionHead num="II." title="Portrait" />
-            <Field
+            <FormSectionHead num="II." title="Portrait" />
+            <FormField
               id="profile-avatar"
               label="Avatar image URL"
               value={avatar}
@@ -106,36 +107,6 @@ export default function ProfileForm() {
 
         <ProfilePreview name={name} avatar={avatar} />
       </div>
-    </div>
-  );
-}
-
-function SectionHead({ num, title }) {
-  return (
-    <div className="editor-section-head">
-      <span className="editor-section-num">{num}</span>
-      <span className="editor-section-title">{title}</span>
-    </div>
-  );
-}
-
-function Field({ id, label, value, onChange, placeholder, hint, error }) {
-  return (
-    <div className="editor-field">
-      <label htmlFor={id}>{label}</label>
-      <input
-        id={id}
-        name={id}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-      />
-      {hint && (
-        <span className="editor-field-foot">
-          <span>{hint}</span>
-        </span>
-      )}
-      {error && <span className="field-error">{error}</span>}
     </div>
   );
 }
