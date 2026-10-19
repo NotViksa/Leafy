@@ -1,6 +1,4 @@
-/* ============================================================
-   Feed
-   ============================================================ */
+/* Feed */
 .feed-header {
   padding-bottom: 24px;
   margin-bottom: 8px;
@@ -169,9 +167,7 @@
 }
 .post-action:hover { color: var(--rust); border-color: var(--rust); }
 
-/* ============================================================
-   Details
-   ============================================================ */
+/* Details */
 .back-link {
   display: inline-block;
   font-family: var(--sans);
@@ -339,9 +335,7 @@
   margin-left: 10px;
 }
 
-/* ============================================================
-   Editor
-   ============================================================ */
+/* Editor */
 .editor { padding-bottom: 60px; }
 
 .editor-head {
@@ -549,9 +543,7 @@
   color: var(--paper);
 }
 
-/* ============================================================
-   Home
-   ============================================================ */
+/* Home */
 .home-hero {
   padding: 16px 0 40px;
   border-bottom: 2px solid var(--ink);
@@ -668,9 +660,7 @@
   color: var(--ink-soft);
 }
 
-/* ============================================================
-   About
-   ============================================================ */
+/* About */
 .about-head {
   padding-bottom: 24px;
   margin-bottom: 32px;
@@ -800,9 +790,7 @@
 }
 .about-link:hover { color: var(--rust); }
 
-/* ============================================================
-   My entries
-   ============================================================ */
+/* My entries */
 .my-posts-new {
   margin-left: auto;
 }
@@ -925,9 +913,7 @@
 .entry-tile-action-danger { color: var(--ink-mute); }
 .entry-tile-action-danger:hover { color: var(--danger); }
 
-/* ============================================================
-   Not found
-   ============================================================ */
+/* Not found */
 .not-found {
   padding: 80px 0;
   text-align: center;
@@ -967,9 +953,7 @@
   flex-wrap: wrap;
 }
 
-/* ============================================================
-   Smooth skeleton → content transition
-   ============================================================ */
+/* Smooth skeleton to content transition */
 @keyframes leaf-fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -982,9 +966,7 @@
   animation: leaf-fade-in 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-/* ============================================================
-   Responsive - larger first, smaller last
-   ============================================================ */
+/* Responsive - larger first, smaller last */
 @media (max-width: 1024px) {
   .editor-grid { grid-template-columns: 1fr; gap: 32px; }
   .preview { position: static; }
