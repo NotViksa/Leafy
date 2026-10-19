@@ -3,7 +3,7 @@ import { authHeaders, handleResponse, tableUrl } from "./client";
 export async function getCommentsForPost(postId, signal) {
   const url = tableUrl("comments", {
     post_id: `eq.${postId}`,
-    order: "created_at.asc",
+    order: "created_at.asc,id.asc",
     select: "*",
   });
   const response = await fetch(url, { headers: authHeaders(), signal });

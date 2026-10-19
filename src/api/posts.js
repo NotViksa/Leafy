@@ -3,7 +3,7 @@ import { authHeaders, handleResponse, tableUrl } from "./client";
 export async function getPostsPage(offset, limit, postType, search, signal) {
   const params = {
     select: "*",
-    order: "created_at.desc",
+    order: "created_at.desc,id.desc",
     offset,
     limit,
   };
