@@ -30,7 +30,7 @@ export default function ProfileForm() {
     if (trimmedName && trimmedName.length < 2)
       next.name = "Display name must be at least 2 characters.";
     else if (trimmedName.length > MAX_NAME)
-      next.name = `Display name must be under ${MAX_NAME} characters.`;
+      next.name = `Display name must be ${MAX_NAME} characters or fewer.`;
 
     if (trimmedAvatar && !/^https?:\/\/\S+$/i.test(trimmedAvatar))
       next.avatar = "Avatar URL must start with http:// or https://";

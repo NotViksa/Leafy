@@ -37,6 +37,7 @@ export default function CommentForm({ postId, onAdded }) {
         },
         accessToken
       );
+      if (!created) throw new Error("Could not post comment");
       onAdded(created);
       setText("");
       notify("Comment posted.");

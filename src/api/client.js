@@ -1,11 +1,12 @@
 import { SUPABASE_URL, SUPABASE_KEY } from "./config";
 
 export function authHeaders(token) {
-  return {
+  const headers = {
     apikey: SUPABASE_KEY,
-    Authorization: `Bearer ${token || SUPABASE_KEY}`,
     "Content-Type": "application/json",
   };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 }
 
 export function tableUrl(table, params = {}) {

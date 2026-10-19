@@ -42,6 +42,7 @@ export default function Create() {
         toPayload(form, profileName(user), profileAvatar(user)),
         accessToken
       );
+      if (!created) throw new Error("Could not publish entry.");
       notify("Entry published.");
       navigate(`/feed/${created.id}`, { replace: true });
     } catch (err) {

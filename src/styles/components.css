@@ -132,6 +132,8 @@
   z-index: 1;
 }
 
+.feed-error { margin-top: 16px; }
+
 .form-foot {
   margin-top: 20px;
   text-align: center;

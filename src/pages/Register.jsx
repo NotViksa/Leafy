@@ -27,7 +27,7 @@ export default function Register() {
     if (name && name.length < 2)
       next.name = "Display name must be at least 2 characters";
     else if (name.length > 40)
-      next.name = "Display name must be under 40 characters";
+      next.name = "Display name must be 40 characters or fewer";
 
     if (!form.email.trim()) next.email = "Email is required";
     else if (!/^\S+@\S+\.\S+$/.test(form.email))

@@ -62,11 +62,15 @@ export default function Edit() {
 
     setSubmitting(true);
     try {
-      await updatePost(
+      const updated = await updatePost(
         postId,
         toPayload(form, authorName, authorAvatar),
         accessToken
       );
+      if (!updated) {
+        setApiError("Could not save changes. You can only edit your own entries.");
+        return;
+      }
       notify("Changes saved.");
       navigate(`/feed/${postId}`, { replace: true });
     } catch (err) {

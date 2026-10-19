@@ -99,7 +99,7 @@ function FeedResults({ postType, search, urlQuery, typeFilter }) {
   return (
     <>
       {error && (
-        <p className="form-error" role="alert" style={{ marginTop: 16 }}>
+        <p className="form-error feed-error" role="alert">
           {error}
         </p>
       )}

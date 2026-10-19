@@ -8,7 +8,7 @@ Live: https://leafy-viksa1.vercel.app · Repo: https://github.com/NotViksa/Leafy
 ## Run locally
 ```bash
 npm install
-cp .env.example .env.local   # fill in the two values
+cp .env.example .env.local   # Windows: copy .env.example .env.local
 npm run dev
 ```
 
@@ -33,9 +33,12 @@ plain CSS in four files. **Source:** `src/api`, `components`, `context`, `hooks`
 growers have learned. Entries are typed as guides, questions, showcases, or tips.
 
 ## 2. User access & permissions
-- **Guest:** Home, Feed, Details, About, Login, Register — read-only.
-- **Authenticated:** adds Create, My entries, Profile, and editing one's own
-  entries; can post comments and edit/delete their own comments.
+- **Guest:** Home (`/`), Feed (`/feed`), Details (`/feed/:postId`), About, Login,
+  Register — read-only. Published entries and comments are fetched from
+  Supabase; every write action requires an account.
+- **Authenticated:** adds Create (`/create`), My entries (`/my-posts`), Profile
+  (`/profile`), and Edit (`/feed/:postId/edit`, author only); can post comments
+  and edit/delete their own comments.
 - **Admin:** `app_metadata.role = "admin"`. Can delete any entry or comment;
   editing stays author-only. Destructive actions use an in-app confirm dialog;
   successful actions show a toast.
@@ -50,8 +53,9 @@ editable on `/profile` via `PUT /auth/v1/user`, and snapshotted onto entries and
 comments when written.
 
 ## 4. Routing structure
-`/`, `/feed`, `/feed/:postId`, `/about`, `/login`, `/register`, `/create`*,
-`/my-posts`*, `/profile`*, `/feed/:postId/edit`*, `*` (404). `*` = authenticated.
+Eleven routes: `/`, `/feed`, `/feed/:postId`, `/about`, `/login`, `/register`,
+`/create`*, `/my-posts`*, `/profile`*, `/feed/:postId/edit`*, `*` (404).
+`*` = authenticated.
 
 - `ProtectedRoute` sends guests to `/login` and returns them afterwards;
   `GuestRoute` keeps logged-in users out of Login/Register.
