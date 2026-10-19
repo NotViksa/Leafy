@@ -16,6 +16,8 @@ export default function SearchBar({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder ?? "Search entries…"}
+          autoComplete="off"
+          spellCheck={false}
         />
         {value && (
           <button

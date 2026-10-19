@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/useToast";
 import { deleteComment, updateComment } from "../api/comments";
 import { COMMENT_MAX_LEN } from "../lib/comments";
 import { DEFAULT_AVATAR } from "../lib/profile";
+import ConfirmDialog from "./ConfirmDialog";
 
 export default function CommentList({ comments, onDeleted, onUpdated }) {
   const { user, accessToken, isAdmin } = useAuth();
+  const notify = useToast();
   const [deletingId, setDeletingId] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState("");
   const [savingId, setSavingId] = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
   const [error, setError] = useState("");
 
   if (comments.length === 0) {
@@ -58,6 +63,7 @@ export default function CommentList({ comments, onDeleted, onUpdated }) {
       }
       onUpdated(updated);
       cancelEdit();
+      notify("Comment updated.");
     } catch (err) {
       setError(err.message || "Could not save comment");
     } finally {
@@ -65,19 +71,26 @@ export default function CommentList({ comments, onDeleted, onUpdated }) {
     }
   }
 
-  async function handleDelete(comment) {
-    if (!confirm("Delete this comment? This cannot be undone.")) return;
-    setError("");
-    setDeletingId(comment.id);
+  function startDelete(comment) {
+    setDeleteError("");
+    setPendingDelete(comment);
+  }
+
+  async function handleDelete() {
+    const id = pendingDelete.id;
+    setDeleteError("");
+    setDeletingId(id);
     try {
-      const deleted = await deleteComment(comment.id, accessToken);
+      const deleted = await deleteComment(id, accessToken);
       if (!deleted) {
-        setError("Could not delete comment.");
+        setDeleteError("Could not delete comment.");
         return;
       }
-      onDeleted(comment.id);
+      setPendingDelete(null);
+      onDeleted(id);
+      notify("Comment deleted.");
     } catch (err) {
-      setError(err.message || "Could not delete comment");
+      setDeleteError(err.message || "Could not delete comment");
     } finally {
       setDeletingId(null);
     }
@@ -85,7 +98,7 @@ export default function CommentList({ comments, onDeleted, onUpdated }) {
 
   return (
     <>
-      {error && <p className="field-error">{error}</p>}
+      {error && <p className="field-error" role="alert">{error}</p>}
       <ul className="comment-list">
         {comments.map((c, i) => (
           <li key={c.id} className="comment">
@@ -121,7 +134,7 @@ export default function CommentList({ comments, onDeleted, onUpdated }) {
                       <button
                         type="button"
                         className="comment-action comment-action-danger"
-                        onClick={() => handleDelete(c)}
+                        onClick={() => startDelete(c)}
                         disabled={deletingId === c.id}
                       >
                         {deletingId === c.id ? "Deleting…" : "Delete"}
@@ -166,6 +179,17 @@ export default function CommentList({ comments, onDeleted, onUpdated }) {
           </li>
         ))}
       </ul>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete this comment?"
+        message="This cannot be undone."
+        error={deleteError}
+        confirmLabel="Delete comment"
+        busy={deletingId !== null}
+        onConfirm={handleDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </>
   );
 }

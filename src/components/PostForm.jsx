@@ -34,7 +34,7 @@ export default function PostForm({
 
       <div className="editor-grid">
         <form onSubmit={onSubmit} className="editor-form" noValidate>
-          {apiError && <p className="form-error">{apiError}</p>}
+          {apiError && <p className="form-error" role="alert">{apiError}</p>}
 
           <section className="editor-section">
             <SectionHead num="I." title="Type" />

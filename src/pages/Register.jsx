@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 export default function Register() {
   const { signUp } = useAuth();
@@ -74,7 +74,7 @@ export default function Register() {
     <form onSubmit={handleSubmit} className="form-card" noValidate>
       <h1>Join Leafy</h1>
 
-      {apiError && <p className="form-error">{apiError}</p>}
+      {apiError && <p className="form-error" role="alert">{apiError}</p>}
 
       <div className="form-field">
         <label htmlFor="reg-name">Display name</label>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/useToast";
 import { getPostById, updatePost } from "../api/posts";
 import PostForm from "../components/PostForm";
 import { EMPTY_POST, validatePost, toPayload, fromPost } from "../lib/postForm";
@@ -8,6 +9,7 @@ import { EMPTY_POST, validatePost, toPayload, fromPost } from "../lib/postForm";
 export default function Edit() {
   const { postId } = useParams();
   const { user, accessToken } = useAuth();
+  const notify = useToast();
   const navigate = useNavigate();
 
   const [form, setForm] = useState(EMPTY_POST);
@@ -65,6 +67,7 @@ export default function Edit() {
         toPayload(form, authorName, authorAvatar),
         accessToken
       );
+      notify("Changes saved.");
       navigate(`/feed/${postId}`, { replace: true });
     } catch (err) {
       setApiError(err.message || "Could not update post");
@@ -78,7 +81,7 @@ export default function Edit() {
   if (!ready) {
     return (
       <div>
-        <p className="form-error">{apiError || "Could not load post."}</p>
+        <p className="form-error" role="alert">{apiError || "Could not load post."}</p>
         <Link to="/feed" className="btn btn-ghost">Back to feed</Link>
       </div>
     );

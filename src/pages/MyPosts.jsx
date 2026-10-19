@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/useToast";
 import { getPostsByOwner, deletePost } from "../api/posts";
 import EmptyState from "../components/EmptyState";
+import ConfirmDialog from "../components/ConfirmDialog";
 import { POST_TYPES } from "../lib/postForm";
 import SearchBar from "../components/SearchBar";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
@@ -17,20 +19,26 @@ const TYPE_LABELS = {
 const FILTERS = [{ value: "", label: "All" }, ...POST_TYPES];
 
 export default function MyPosts() {
-  const { user, accessToken } = useAuth();
+  const { user } = useAuth();
+  return <MyPostsView key={user?.id ?? "guest"} user={user} />;
+}
+
+function MyPostsView({ user }) {
+  const { accessToken } = useAuth();
+  const notify = useToast();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("");
   const [search, setSearch] = useState("");
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const debouncedSearch = useDebouncedValue(search, 250);
 
   useEffect(() => {
     if (!user) return;
     const controller = new AbortController();
-
-    setLoading(true);
-    setError("");
 
     getPostsByOwner(user.id, controller.signal)
       .then(setPosts)
@@ -45,14 +53,27 @@ export default function MyPosts() {
     return () => controller.abort();
   }, [user]);
 
-  async function handleDelete(id) {
-    if (!confirm("Delete this entry? This cannot be undone.")) return;
+  function openDelete(id) {
+    setDeleteError("");
+    setPendingDelete(id);
+  }
 
+  async function handleDelete() {
+    setDeleting(true);
+    setDeleteError("");
     try {
-      await deletePost(id, accessToken);
-      setPosts((prev) => prev.filter((p) => p.id !== id));
+      const deleted = await deletePost(pendingDelete, accessToken);
+      if (!deleted) {
+        setDeleteError("Could not delete entry");
+        return;
+      }
+      setPosts((prev) => prev.filter((p) => p.id !== pendingDelete));
+      setPendingDelete(null);
+      notify("Entry deleted.");
     } catch (err) {
-      setError(err.message || "Could not delete entry");
+      setDeleteError(err.message || "Could not delete entry");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -113,7 +134,7 @@ export default function MyPosts() {
         <Link to="/create" className="btn btn-primary my-posts-new">New entry</Link>
       </nav>
 
-      {error && <p className="form-error">{error}</p>}
+      {error && <p className="form-error" role="alert">{error}</p>}
 
       {loading && <p className="page-loading">Loading your entries…</p>}
 
@@ -146,10 +167,21 @@ export default function MyPosts() {
       {!loading && filtered.length > 0 && (
         <div className="entry-grid">
           {filtered.map((post) => (
-            <EntryTile key={post.id} post={post} onDelete={handleDelete} />
+            <EntryTile key={post.id} post={post} onDelete={openDelete} />
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete this entry?"
+        message="This cannot be undone. Its comments will be removed too."
+        error={deleteError}
+        confirmLabel="Delete entry"
+        busy={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </>
   );
 }

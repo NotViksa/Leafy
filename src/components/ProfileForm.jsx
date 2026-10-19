@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import ProfilePreview from "./ProfilePreview";
 import { profileName } from "../lib/profile";
 
@@ -68,7 +68,7 @@ export default function ProfileForm() {
 
       <div className="editor-grid">
         <form onSubmit={handleSubmit} className="editor-form" noValidate>
-          {apiError && <p className="form-error">{apiError}</p>}
+          {apiError && <p className="form-error" role="alert">{apiError}</p>}
 
           <section className="editor-section">
             <SectionHead num="I." title="Identity" />

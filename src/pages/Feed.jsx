@@ -26,35 +26,12 @@ export default function Feed() {
     setSearchParams(next, { replace: true });
   }, [debouncedSearch, typeFilter, urlQuery, setSearchParams]);
 
-  const { posts, loading, error, loadMore, hasLoadedOnce } =
-    useInfinitePosts(typeFilter || null, urlQuery || null);
-
-  const sentinelRef = useRef(null);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) loadMore();
-      },
-      { rootMargin: "300px" }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [loadMore]);
-
   function setFilter(value) {
     const next = {};
     if (value) next.type = value;
     if (urlQuery) next.q = urlQuery;
     setSearchParams(next);
   }
-
-  const isInitialLoad = loading && !hasLoadedOnce;
-  const isEmpty = !loading && posts.length === 0 && !error;
 
   return (
     <>
@@ -82,10 +59,53 @@ export default function Feed() {
         ))}
       </nav>
 
-      {error && <p className="form-error" style={{ marginTop: 16 }}>{error}</p>}
+      <FeedResults
+        key={`${typeFilter}|${urlQuery}`}
+        postType={typeFilter || null}
+        search={urlQuery || null}
+        urlQuery={urlQuery}
+        typeFilter={typeFilter}
+      />
+    </>
+  );
+}
+
+function FeedResults({ postType, search, urlQuery, typeFilter }) {
+  const { posts, loading, error, loadMore, hasLoadedOnce } = useInfinitePosts(
+    postType,
+    search
+  );
+
+  const sentinelRef = useRef(null);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) loadMore();
+      },
+      { rootMargin: "300px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  const isInitialLoad = loading && !hasLoadedOnce;
+  const isEmpty = !loading && posts.length === 0 && !error;
+
+  return (
+    <>
+      {error && (
+        <p className="form-error" role="alert" style={{ marginTop: 16 }}>
+          {error}
+        </p>
+      )}
 
       {isInitialLoad && (
-        <div className="feed-list">
+        <div className="feed-list" aria-busy="true">
           <PostCardSkeleton />
           <PostCardSkeleton />
           <PostCardSkeleton />

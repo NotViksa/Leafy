@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/useToast";
 import { createPost } from "../api/posts";
 import PostForm from "../components/PostForm";
 import {
@@ -12,6 +13,7 @@ import { profileName, profileAvatar } from "../lib/profile";
 
 export default function Create() {
   const { user, accessToken } = useAuth();
+  const notify = useToast();
   const navigate = useNavigate();
 
   const [form, setForm] = useState(EMPTY_POST);
@@ -40,6 +42,7 @@ export default function Create() {
         toPayload(form, profileName(user), profileAvatar(user)),
         accessToken
       );
+      notify("Entry published.");
       navigate(`/feed/${created.id}`, { replace: true });
     } catch (err) {
       setApiError(err.message || "Could not create post");

@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { AuthContext } from "./authContext";
 import {
   signIn as apiSignIn,
   signUp as apiSignUp,
@@ -7,7 +8,6 @@ import {
   refreshSession,
 } from "../api/auth";
 
-const AuthContext = createContext(null);
 const STORAGE_KEY = "leafy_session";
 
 function readStored() {
@@ -34,25 +34,20 @@ function toSession(res) {
   };
 }
 
+function needsRefresh(stored) {
+  return Date.now() > stored.obtained_at + stored.expires_in * 1000 - 60_000;
+}
+
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState(readStored);
+  const [loading, setLoading] = useState(() => {
+    const stored = readStored();
+    return stored ? needsRefresh(stored) : false;
+  });
 
   useEffect(() => {
     const stored = readStored();
-    if (!stored) {
-      setLoading(false);
-      return;
-    }
-
-    const expiresAt = stored.obtained_at + stored.expires_in * 1000;
-    const needsRefresh = Date.now() > expiresAt - 60_000;
-
-    if (!needsRefresh) {
-      setSession(stored);
-      setLoading(false);
-      return;
-    }
+    if (!stored || !needsRefresh(stored)) return;
 
     refreshSession(stored.refresh_token)
       .then((fresh) => {
@@ -110,10 +105,4 @@ export function AuthProvider({ children }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
-  return ctx;
 }

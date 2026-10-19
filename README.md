@@ -1,255 +1,129 @@
 # Leafy
 
-A houseplant community site. People write care guides, ask questions, show
-off plants, or post quick tips. It's styled like a field journal.
+A houseplant community journal. Members write care guides, questions, showcases,
+and tips; the UI is styled like a botanist's field notebook.
 
-Live: https://leafy-viksa1.vercel.app
+Live: https://leafy-viksa1.vercel.app · Repo: https://github.com/NotViksa/Leafy
 
-Repo: https://github.com/NotViksa/Leafy
-
-## Running it
-
+## Run locally
 ```bash
 npm install
 cp .env.example .env.local   # fill in the two values
 npm run dev
 ```
 
-You need a Supabase project. In `.env.local`:
+`.env.local` (values are in Supabase under Settings → API Keys):
 
 ```
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
-Both are in Supabase under Settings → API Keys.
+Create the `posts` and `comments` tables, enable RLS, add the policies from
+section 6, and turn "Confirm email" off. Scripts: `npm run build`, `npm run lint`, `npm run preview`.
 
-For the database: create two tables (`posts`, `comments`), enable RLS, add
-the policies, and turn on the Email provider with "Confirm email" off. The
-schema and policies are in the Functional Guide below. Set the Site URL to
-`http://localhost:5173` in Supabase Auth settings.
-
-## Stack
-
-React 19 + Vite + React Router 7. Backend is Supabase (Postgres + Auth +
-REST). Plain CSS in four files. No frameworks on top of that.
-
-## Structure
-
-```
-src/
-├── api/         Supabase REST calls
-├── components/  layout, navbar, cards, forms, guards, states, error boundary
-├── context/     AuthContext
-├── hooks/       useInfinitePosts, useDebouncedValue
-├── lib/         postForm + profile (validation, payload, display name/avatar helpers)
-├── pages/       Home, Feed, Details, Create, Edit, MyPosts, Profile,
-│                Login, Register, About, NotFound
-├── styles/      tokens, base, components, pages
-├── App.jsx
-└── main.jsx
-```
-
----
+**Stack:** React 19, Vite, React Router 7, Supabase (Postgres + Auth + REST),
+plain CSS in four files. **Source:** `src/api`, `components`, `context`, `hooks`, `lib`, `pages`, `styles`; routes in `App.jsx`.
 
 # Functional Guide
+## 1. Project overview
+**Name:** Leafy · **Category:** Community blog / journal for houseplant care
 
-## 1. Overview
+**Purpose:** Record what works when keeping plants alive and read what other
+growers have learned. Entries are typed as guides, questions, showcases, or tips.
 
-**Name:** Leafy
+## 2. User access & permissions
+- **Guest:** Home, Feed, Details, About, Login, Register — read-only.
+- **Authenticated:** adds Create, My entries, Profile, and editing one's own
+  entries; can post comments and edit/delete their own comments.
+- **Admin:** `app_metadata.role = "admin"`. Can delete any entry or comment;
+  editing stays author-only. Destructive actions use an in-app confirm dialog;
+  successful actions show a toast.
 
-**Category:** Community blog / journal for indoor plant care
+## 3. Authentication & session handling
+Register/Login call Supabase Auth. On success the session (tokens + user) lives
+in `AuthContext` and `localStorage` (`leafy_session`). On load, an expired access
+token is refreshed with the refresh token; if that fails the session is cleared.
+Logout calls Supabase (`scope=local`) and clears both stores. Guards wait for
+the auth loading state. Display name/avatar are optional at registration,
+editable on `/profile` via `PUT /auth/v1/user`, and snapshotted onto entries and
+comments when written.
 
-**Purpose:** A place to write down what you've learned about keeping
-specific houseplants alive, and to read what others have figured out.
+## 4. Routing structure
+`/`, `/feed`, `/feed/:postId`, `/about`, `/login`, `/register`, `/create`*,
+`/my-posts`*, `/profile`*, `/feed/:postId/edit`*, `*` (404). `*` = authenticated.
 
-## 2. Access
+- `ProtectedRoute` sends guests to `/login` and returns them afterwards;
+  `GuestRoute` keeps logged-in users out of Login/Register.
+- `Layout` (navbar, sidebar, footer) wraps pages; `AuthLayout` wraps only
+  Login/Register.
+- `/feed/:postId` and `/feed/:postId/edit` are parameterized; Details, Edit, and
+  My entries are the dynamic pages.
 
-**Guests** see Home, Feed, Details, About, Login, Register. They can read
-posts and comments but can't write anything.
+## 5. List → details flow
+- **Feed (catalog):** six posts per page, newest first, via `GET /posts`.
+  Infinite scroll uses an `IntersectionObserver` and loops when the database
+  runs out. Tabs write `?type=`; debounced search writes `?q=` and matches
+  title/description with `ilike`.
+- **Details:** opened via `Link`; reads `postId` with `useParams`, fetches the
+  post and comments in parallel, aborts on unmount.
+- **My entries:** the author's posts in a tile grid with client-side filter and
+  search.
 
-**Logged-in users** get everything above plus Create, My Posts, Profile,
-and Edit on their own entries. Comment authors can edit and delete their
-own comments.
+## 6. Data source & backend
+Supabase BaaS; no custom server. `fetch` sends the publishable key plus the
+user's token.
 
-**Admins** (accounts with `role = admin` in Supabase `app_metadata`) can
-delete any entry or comment from the details page - delete only; editing
-always stays with the author.
+`posts`: `id`, `post_type`, `author_name`, `author_avatar`, `title`, `description`, `image_url`, `plant_name`, `care_level`, `light_need`, `water_frequency`, `content`, `owner_id`, `created_at`.
 
-## 3. Auth
+`comments`: `id`, `post_id`, `comment`, `author_name`, `author_avatar`, `owner_id`, `created_at`.
 
-Register and Login both hit Supabase Auth endpoints. On success the session
-(access token, refresh token, user) goes into `AuthContext` and
-`localStorage` under `leafy_session`.
+RLS: public read on both; posts insert/update/delete only when
+`owner_id = auth.uid()`; comments insert/update by owner; comments delete by
+owner or admin; admins may delete posts.
 
-Register takes an optional display name; it's stored in the Supabase user
-metadata (`display_name`) together with an optional avatar URL. The Profile
-page (menu item 05, or clicking your name in the sidebar) edits both via
-PUT to `/auth/v1/user`, and the context session updates in place.
+## 7. Data operations (CRUD)
+- **Create:** `/create` validates, then `POST /posts` with the author snapshot;
+  the database supplies `id`, `owner_id`, `created_at`. Redirects to the entry.
+- **Read:** paginated feed GET, `?id=eq.` for Details, `?owner_id=eq.` for My entries.
+- **Update/Delete:** Edit checks ownership and `PATCH`es the row; RLS also
+  rejects non-owners. Delete asks for confirmation, then `DELETE`s; comments
+  cascade. Details redirects to the feed, My entries removes the tile in place.
+  Comments update/delete in place by their author (delete also by admins).
 
-On page load `AuthContext` reads that key. If the access token is still
-valid it's reused. If it's expired or about to expire, the refresh token is
-exchanged for a new session. If that fails, the session is cleared and the
-user is treated as a guest.
+## 8. Forms & validation
+Register, Login, Create, Edit, Comment, Profile — controlled inputs, synthetic
+events, `noValidate`, per-field errors, API error blocks, loading labels.
 
-Logout posts to Supabase's logout endpoint (`scope=local`) and clears
-both Context and localStorage. Passwords are never stored.
+- **Title:** required, 3–120 characters. **Description:** required, 10–500.
+- **Comment:** required, max 500 characters (create and edit).
+- **Image URL:** optional except showcases; must start with `http://` or
+  `https://` if present. **Plant name:** required for guides/showcases, <80 chars.
+- **Email/password:** email pattern, 6+ characters, confirmation must match;
+  **profile:** display name 2–40 characters, avatar URL must be http(s).
 
-## 4. Routing
+## 9. React-specific techniques
+- **Hooks:** `useState`, `useEffect`, `useRef`, `useContext`, `useCallback`,
+  `useMemo`, plus `useParams`, `useNavigate`, `useLocation`, `useSearchParams`.
+- **Lifecycle:** `useInfinitePosts` fetches page one on mount, resets on
+  filter/search change, discards stale responses with a generation counter, and
+  disconnects the observer on unmount; Details, Edit, My entries abort requests.
+- **Context:** `AuthContext` (user, token, `isAdmin`, loading, auth actions) and
+  `ToastContext` (notifier), consumed across guards, nav, forms, and pages.
+- **Styling:** plain external CSS (`tokens`, `base`, `components`, `pages`);
+  `ErrorBoundary` is the only class component and resets per route.
+## 10. Typical user flow
+1. Land on Home, open the Feed, filter or search.
+2. Open an entry; log in if needed.
+3. Publish a new entry via the live-preview form.
+4. Comment, then edit or delete your comment later.
+5. Update the profile, then log out.
 
-Routes:
-
-- `/` - Home
-- `/feed` - feed with filter tabs
-- `/feed/:postId` - details
-- `/feed/:postId/edit` - edit (author only)
-- `/create` - new entry (logged in)
-- `/my-posts` - own entries (logged in)
-- `/profile` - name and avatar (logged in)
-- `/login`, `/register` - guests only
-- `/about`
-- `*` - 404
-
-`ProtectedRoute` redirects guests to `/login` and remembers where they
-were headed; after a successful login they land back on that route.
-`GuestRoute` redirects logged-in users to `/`. Both wait for the auth
-session to finish loading before deciding, so a refresh doesn't bounce
-you to login.
-
-`Layout` wraps the main pages with Navbar, Sidebar, and Footer. `AuthLayout`
-wraps only Login and Register.
-
-## 5. Feed and details
-
-The feed fetches 6 posts at a time, newest first. An `IntersectionObserver`
-on a sentinel at the bottom triggers the next page. When a fetch returns
-fewer than 6 rows, the feed restarts from offset 0 with an incremented loop
-counter so it scrolls forever. A `Set` of keys prevents duplicate appends
-if two fetches race.
-
-Filter tabs write to the URL (`?type=guide`), so a filtered feed is
-shareable and survives refresh. The search box works the same way: it's
-debounced 350 ms, matches title and description server-side (`ilike`),
-and syncs to `?q=`.
-
-Details loads the post and its comments in parallel, aborts on cleanup.
-
-## 6. Backend
-
-Supabase, used as a backend-as-a-service. No custom server.
-
-**`posts`** columns: `id`, `post_type` (guide/question/showcase/tip),
-`author_name`, `author_avatar`, `title`, `description`, `image_url`,
-`plant_name`, `care_level`, `light_need`, `water_frequency`, `content`,
-`owner_id`, `created_at`.
-
-**`comments`** columns: `id`, `post_id`, `comment`, `author_name`,
-`author_avatar`, `owner_id`, `created_at`.
-
-Entries and comments store the author's display name and avatar URL at
-writing time, so lists render without joins. Users without a custom avatar
-fall back to a neutral gray placeholder avatar; users without a display
-name fall back to the part of their email before the `@`.
-
-Both have RLS enabled. Policies:
-
-- `posts`: public read; insert/update/delete allowed only when
-  `owner_id = auth.uid()`; admins can also delete
-- `comments`: public read; insert allowed when `owner_id = auth.uid()`;
-  owners and admins can delete
-
-The frontend talks to these tables via `/rest/v1/posts` and
-`/rest/v1/comments` using the publishable key plus the user's access token.
-
-## 7. CRUD
-
-All four operations work on `posts`.
-
-**Create** - `/create` validates locally, then `POST /rest/v1/posts`.
-`owner_id` and `created_at` are filled by the database. The row also stores
-the author's current display name and avatar URL. Redirects to the new
-entry.
-
-**Read** - feed uses paginated GET, details uses `?id=eq.{id}`, my-posts
-uses `?owner_id=eq.{userId}`.
-
-**Update** - `/feed/:postId/edit` loads the post, checks ownership, then
-`PATCH /rest/v1/posts?id=eq.{id}`. RLS rejects it server-side if the caller
-isn't the owner.
-
-**Delete** - confirm dialog, then `DELETE /rest/v1/posts?id=eq.{id}`.
-Comments cascade. From the details page it redirects to `/feed`; in My
-Entries the tile disappears in place. Comments themselves can be edited in
-place by their author (`PATCH /rest/v1/comments?id=eq.{id}`) and deleted
-the same way (`DELETE /rest/v1/comments?id=eq.{id}`) by their author or an
-admin - the row updates or disappears in the list in place.
-
-## 8. Forms
-
-Register, Login, Create, Edit, Comment, and Profile. All controlled
-inputs with `useState`, all use `noValidate` and show per-field errors plus
-an API error block.
-
-Validation:
-
-- Email - required, must match a basic email pattern
-- Password - required, 6+ characters on Register, confirm must match
-- Display name - optional; if given, 2–40 characters (Register + Profile)
-- Avatar URL - optional; must start with `http://` or `https://` if given
-- Title - 3–120 characters
-- Image URL - optional except for showcase; must start with `http://` or
-  `https://` if present
-- Description - 10–500 characters
-- Plant name - required for guides and showcases, under 80 characters
-- Care fields (guide only) - care level and light required, watering
-  required, content 30+ characters
-- Comment - required, max 500 characters (create and edit)
-
-## 9. React bits
-
-Hooks used: `useState`, `useEffect`, `useRef`, `useContext`, `useCallback`,
-`useMemo`, plus the router hooks (`useParams`, `useNavigate`, `useLocation`,
-`useSearchParams`).
-
-Mount / update / unmount example - `useInfinitePosts`. On mount it resets
-refs and fetches page 1. When the filter or search changes it resets and
-refetches. A generation counter discards stale responses, so an older
-slow request can't overwrite a newer list, and StrictMode's double mount
-doesn't double the posts. On unmount the `Feed` observer disconnects;
-`Details`, `Edit`, and `MyPosts` use an `AbortController` to cancel
-in-flight fetches.
-
-Context - `AuthContext` exposes `user`, `accessToken`, `isAdmin`, `loading`,
-`signIn`, `signUp`, `signOut`, `updateProfile`. Used by Navbar, Sidebar,
-both route guards, the pages that read or write data, `CommentForm`,
-`CommentList`, and `ProfileForm`.
-`PostForm` stays presentational - Create and Edit own the state and pass
-handlers down.
-
-`ErrorBoundary` is the one class component: `getDerivedStateFromError`
-swaps in a fallback card when a page throws during render, and
-`componentDidCatch` logs the error. The navbar and sidebar stay usable,
-and the boundary resets on route change or "Try again".
-
-Styling - plain CSS, four files: `tokens.css`, `base.css`,
-`components.css`, `pages.css`.
-
-## 10. Normal flow
-
-Land on Home. Click into the Feed. Filter by type. Open a post. Log in.
-Write an entry with the live preview form. Submit and land on the new
-entry. Comment on it. Open the Profile page, set a display name and
-avatar. Log out.
-
-## 11. Edge cases
-
-- Login/register errors come straight from Supabase and show above the
-  form fields
-- Every fetch is wrapped in try/catch; errors show inline
-- Missing post ID shows a styled 404 block with a link back to the feed
-- Empty feed, empty filter, and empty My Entries all show an `EmptyState`
-- Feed skeletons while loading, details skeleton while loading
-- Duplicate keys guarded with a Set in the infinite scroll hook
-- A 401 mid-session clears the stored session on next refresh
-- A route-level `ErrorBoundary` catches a crashing page and shows a
-  fallback with "Try again" while the navbar and sidebar keep working
+## 11. Error & edge-case handling
+- API/network errors show inline with `role="alert"`; successful mutations toast.
+- Missing post IDs show a 404 state; empty feed/filter/search/My entries show
+  `EmptyState`.
+- Skeletons cover initial loading; buttons disable and relabel while submitting.
+- Duplicate infinite-scroll keys are guarded with a `Set`; stale responses are
+  ignored. Return-to-page after login; route-level `ErrorBoundary` keeps nav
+  usable. RLS enforces ownership server-side even if the UI is bypassed.

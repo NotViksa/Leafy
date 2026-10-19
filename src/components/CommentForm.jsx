@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/useToast";
 import { createComment } from "../api/comments";
 import { COMMENT_MAX_LEN } from "../lib/comments";
 import { profileName, profileAvatar } from "../lib/profile";
 
 export default function CommentForm({ postId, onAdded }) {
   const { user, accessToken } = useAuth();
+  const notify = useToast();
   const [text, setText] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -37,6 +39,7 @@ export default function CommentForm({ postId, onAdded }) {
       );
       onAdded(created);
       setText("");
+      notify("Comment posted.");
     } catch (err) {
       setError(err.message || "Could not post comment");
     } finally {
@@ -53,7 +56,7 @@ export default function CommentForm({ postId, onAdded }) {
         rows={3}
         maxLength={COMMENT_MAX_LEN + 50}
       />
-      {error && <p className="field-error">{error}</p>}
+      {error && <p className="field-error" role="alert">{error}</p>}
       <div className="comment-form-foot">
         <span className="comment-form-count">
           {text.length}/{COMMENT_MAX_LEN}

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/useToast";
 import { getPostById, deletePost } from "../api/posts";
 import { getCommentsForPost } from "../api/comments";
 import CommentList from "../components/CommentList";
 import CommentForm from "../components/CommentForm";
+import ConfirmDialog from "../components/ConfirmDialog";
 import EmptyState from "../components/EmptyState";
 import { DetailsSkeleton } from "../components/Skeleton";
 import { DEFAULT_AVATAR } from "../lib/profile";
@@ -25,7 +27,12 @@ const COMMENT_HEADINGS = {
 
 export default function Details() {
   const { postId } = useParams();
+  return <DetailsView key={postId} postId={postId} />;
+}
+
+function DetailsView({ postId }) {
   const { user, accessToken, isAdmin } = useAuth();
+  const notify = useToast();
   const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
@@ -34,11 +41,11 @@ export default function Details() {
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
-    setError("");
 
     Promise.all([
       getPostById(postId, controller.signal),
@@ -63,18 +70,20 @@ export default function Details() {
   }, [postId]);
 
   async function handleDelete() {
-    if (!confirm("Delete this entry? This cannot be undone.")) return;
     setDeleting(true);
+    setDeleteError("");
     try {
       const deleted = await deletePost(post.id, accessToken);
       if (!deleted) {
-        setError("Could not delete post");
-        setDeleting(false);
+        setDeleteError("Could not delete post");
         return;
       }
+      setConfirmingDelete(false);
+      notify("Entry deleted.");
       navigate("/feed", { replace: true });
     } catch (err) {
-      setError(err.message || "Could not delete post");
+      setDeleteError(err.message || "Could not delete post");
+    } finally {
       setDeleting(false);
     }
   }
@@ -93,19 +102,19 @@ export default function Details() {
     );
   }
 
-if (loading && !hasLoaded) return <DetailsSkeleton />;
-if (error) return <p className="form-error">{error}</p>;
-if (!post) {
-  return (
-    <EmptyState
-      kicker="404 · Missing entry"
-      title="This entry does not exist."
-      message="It may have been deleted by its author, or the link may be wrong."
-      ctaTo="/feed"
-      ctaLabel="Back to the feed"
-    />
-  );
-}
+  if (loading && !hasLoaded) return <DetailsSkeleton />;
+  if (error) return <p className="form-error" role="alert">{error}</p>;
+  if (!post) {
+    return (
+      <EmptyState
+        kicker="404 · Missing entry"
+        title="This entry does not exist."
+        message="It may have been deleted by its author, or the link may be wrong."
+        ctaTo="/feed"
+        ctaLabel="Back to the feed"
+      />
+    );
+  }
 
   const type = post.post_type ?? "guide";
   const isOwner = user && post.owner_id === user.id;
@@ -181,8 +190,15 @@ if (!post) {
           {isOwner && (
             <Link to={`/feed/${post.id}/edit`} className="btn btn-ghost">Edit entry</Link>
           )}
-          <button onClick={handleDelete} className="btn btn-danger" disabled={deleting}>
-            {deleting ? "Deleting…" : "Delete"}
+          <button
+            onClick={() => {
+              setDeleteError("");
+              setConfirmingDelete(true);
+            }}
+            className="btn btn-danger"
+            disabled={deleting}
+          >
+            Delete
           </button>
         </div>
       )}
@@ -206,6 +222,17 @@ if (!post) {
           </p>
         )}
       </section>
+
+      <ConfirmDialog
+        open={confirmingDelete}
+        title="Delete this entry?"
+        message="This cannot be undone. Its comments will be removed too."
+        error={deleteError}
+        confirmLabel="Delete entry"
+        busy={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmingDelete(false)}
+      />
     </article>
   );
 }

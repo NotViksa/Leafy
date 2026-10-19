@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/useToast";
 import { profileName, profileAvatar } from "../lib/profile";
 
 const NAV_ITEMS = [
@@ -68,6 +69,19 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const hiddenRef = useRef(false);
+  const drawerRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    drawerRef.current?.focus();
+
+    function handleKey(e) {
+      if (e.key === "Escape") setOpen(false);
+    }
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open]);
 
   useEffect(() => {
     let lastY = window.scrollY;
@@ -131,7 +145,15 @@ export default function Navbar() {
 
       {open && (
         <div className="mobile-overlay" onClick={() => setOpen(false)}>
-          <aside className="mobile-drawer" onClick={(e) => e.stopPropagation()}>
+          <aside
+            ref={drawerRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+            className="mobile-drawer"
+            onClick={(e) => e.stopPropagation()}
+          >
             <MobileDrawerContent onClose={() => setOpen(false)} />
           </aside>
         </div>
@@ -142,10 +164,12 @@ export default function Navbar() {
 
 function MobileDrawerContent({ onClose }) {
   const { user, signOut } = useAuth();
+  const notify = useToast();
   const navigate = useNavigate();
 
   async function handleLogout() {
     await signOut();
+    notify("Signed out.");
     onClose();
     navigate("/", { replace: true });
   }

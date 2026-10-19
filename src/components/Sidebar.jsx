@@ -1,14 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/useToast";
 import { profileName, profileAvatar } from "../lib/profile";
 import { NavLinks } from "./Navbar";
 
 export default function Sidebar() {
   const { user, signOut } = useAuth();
+  const notify = useToast();
   const navigate = useNavigate();
 
   async function handleLogout() {
     await signOut();
+    notify("Signed out.");
     navigate("/", { replace: true });
   }
 
