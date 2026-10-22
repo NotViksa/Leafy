@@ -10,7 +10,6 @@ export default function About() {
   return (
     <article className="about">
       <header className="about-head">
-        <p className="about-kicker">About this journal</p>
         <h1 className="about-title">
           Leafy is a field journal, <em>not a shop.</em>
         </h1>
@@ -37,7 +36,7 @@ export default function About() {
 
           <h2 className="about-heading">On plants</h2>
           <p>
-            Most houseplants die of kindness - too much water, too much light,
+            Most houseplants die of kindness, too much water, too much light,
             too much attention. The best guides here are written by people who
             killed the plant first and learned from it.
           </p>
@@ -52,12 +51,7 @@ export default function About() {
 
         <aside className="about-side">
           <div className="about-card">
-            <span className="about-card-label">Colophon</span>
             <dl className="about-facts">
-              <div>
-                <dt>Volume</dt>
-                <dd>01</dd>
-              </div>
               <div>
                 <dt>Issue</dt>
                 <dd>{DATE_STAMP}</dd>
@@ -76,10 +70,6 @@ export default function About() {
               </div>
             </dl>
           </div>
-
-          <blockquote className="about-quote">
-            “The best plant guide is written by someone who killed it first.”
-          </blockquote>
 
           <Link to="/feed" className="about-link">
             Read the latest entries →

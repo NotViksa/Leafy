@@ -77,7 +77,7 @@ export default function Register() {
       {apiError && <p className="form-error" role="alert">{apiError}</p>}
 
       <div className="form-field">
-        <label htmlFor="reg-name">Display name</label>
+        <label htmlFor="reg-name">Display name (optional)</label>
         <input
           id="reg-name"
           type="text"
@@ -85,7 +85,6 @@ export default function Register() {
           value={form.name}
           onChange={handleChange}
           autoComplete="nickname"
-          placeholder="Optional - shown on your entries and comments"
         />
         {errors.name && <span className="field-error">{errors.name}</span>}
       </div>
@@ -139,9 +138,9 @@ export default function Register() {
         {submitting ? "Creating account…" : "Create account"}
       </button>
 
-      <p className="form-foot">
-        Already a member? <Link to="/login">Log in</Link>
-      </p>
+      <Link to="/login" className="btn btn-ghost btn-block form-alt">
+        Sign in instead
+      </Link>
     </form>
   );
 }

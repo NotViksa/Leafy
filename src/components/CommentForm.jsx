@@ -50,9 +50,9 @@ export default function CommentForm({ postId, onAdded }) {
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Share your thoughts…"
         rows={3}
         maxLength={COMMENT_MAX_LEN + 50}
+        aria-label="Comment"
       />
       {error && <p className="field-error" role="alert">{error}</p>}
       <div className="comment-form-foot">

@@ -24,7 +24,7 @@ const SECTIONS = [
     type: "tip",
     label: "Quick tips",
     title: "One-line lessons",
-    text: "Small truths learned the hard way. Short enough to remember, useful enough to save.",
+    text: "Small tips learned the hard way.",
   },
 ];
 
@@ -34,7 +34,6 @@ export default function Home() {
   return (
     <>
       <section className="home-hero">
-        <p className="home-kicker">Vol. 01 · A field journal for indoor gardeners</p>
         <h1 className="home-title">
           Notes on keeping <em>plants</em> alive indoors.
         </h1>

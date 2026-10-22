@@ -15,10 +15,6 @@ export const POST_TYPE_LABELS = {
   tip: "Tip",
 };
 
-export function entryNumber(id) {
-  return String(id).padStart(3, "0");
-}
-
 export const EMPTY_POST = {
   post_type: "guide",
   title: "",
@@ -38,19 +34,8 @@ const DESCRIPTION_LABELS = {
   tip:      "Your tip",
 };
 
-const DESCRIPTION_HINTS = {
-  guide:    "Shown on the feed card, clamped to 3 lines.",
-  question: "Ask clearly - what do you want to know?",
-  showcase: "A few words about the photo or the plant.",
-  tip:      "Keep it short and useful.",
-};
-
 export function descriptionLabel(type) {
   return DESCRIPTION_LABELS[type] ?? "Description";
-}
-
-export function descriptionHint(type) {
-  return DESCRIPTION_HINTS[type] ?? "Shown on the feed.";
 }
 
 export function fieldsFor(type) {

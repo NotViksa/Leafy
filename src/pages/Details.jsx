@@ -10,7 +10,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import EmptyState from "../components/EmptyState";
 import { DetailsSkeleton } from "../components/Skeleton";
 import { DEFAULT_AVATAR } from "../lib/profile";
-import { POST_TYPE_LABELS, entryNumber } from "../lib/postForm";
+import { POST_TYPE_LABELS } from "../lib/postForm";
 
 const COMMENT_HEADINGS = {
   guide: "Annotations",
@@ -101,9 +101,7 @@ function DetailsView({ postId }) {
   if (!post) {
     return (
       <EmptyState
-        kicker="404 · Missing entry"
         title="This entry does not exist."
-        message="It may have been deleted by its author, or the link may be wrong."
         ctaTo="/feed"
         ctaLabel="Back to the feed"
       />
@@ -112,7 +110,6 @@ function DetailsView({ postId }) {
 
   const type = post.post_type ?? "guide";
   const isOwner = user && post.owner_id === user.id;
-  const entryNum = entryNumber(post.id);
   const isGuide = type === "guide";
 
   return (
@@ -120,8 +117,8 @@ function DetailsView({ postId }) {
       <Link to="/feed" className="back-link">← Back to the feed</Link>
 
       <header className="details-head">
-        <p className="details-kicker">
-          {POST_TYPE_LABELS[type]} · N°{entryNum}
+        <p className="details-type">
+          <span className={`type type-${type}`}>{POST_TYPE_LABELS[type]}</span>
         </p>
         <h1 className="details-title">{post.title}</h1>
         {post.plant_name && <p className="details-plant">{post.plant_name}</p>}
@@ -133,10 +130,7 @@ function DetailsView({ postId }) {
             width="40"
             height="40"
           />
-          <div>
-            <span className="author-line-name">{post.author_name}</span>
-            <span className="author-line-label">Author</span>
-          </div>
+          <span className="author-line-name">{post.author_name}</span>
         </div>
       </header>
 
@@ -150,11 +144,6 @@ function DetailsView({ postId }) {
               height="800"
             />
           </div>
-          {isGuide && (
-            <figcaption className="plate-caption">
-              Plate {entryNum} - {post.plant_name}
-            </figcaption>
-          )}
         </figure>
       )}
 
@@ -198,9 +187,7 @@ function DetailsView({ postId }) {
       )}
 
       <section className="comments">
-        <h2 className="comments-heading">
-          {COMMENT_HEADINGS[type]} <span>{comments.length} total</span>
-        </h2>
+        <h2 className="comments-heading">{COMMENT_HEADINGS[type]}</h2>
 
         <CommentList
           comments={comments}
@@ -211,9 +198,7 @@ function DetailsView({ postId }) {
         {user ? (
           <CommentForm postId={post.id} onAdded={handleCommentAdded} />
         ) : (
-          <p className="comments-login">
-            <Link to="/login">Log in</Link> to leave a reply.
-          </p>
+          <Link to="/login" className="btn btn-ghost">Log in to comment</Link>
         )}
       </section>
 

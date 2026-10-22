@@ -1,22 +1,16 @@
-export function FormSectionHead({ num, title }) {
+export function FormSectionHead({ title }) {
   return (
     <div className="editor-section-head">
-      <span className="editor-section-num">{num}</span>
-      <span className="editor-section-title">{title}</span>
+      <h2 className="editor-section-title">{title}</h2>
     </div>
   );
 }
 
-export function FormField({ id, label, value, onChange, placeholder, hint, error }) {
+export function FormField({ id, label, value, onChange, error }) {
   return (
     <div className="editor-field">
       <label htmlFor={id}>{label}</label>
-      <input id={id} name={id} value={value} onChange={onChange} placeholder={placeholder} />
-      {hint && (
-        <span className="editor-field-foot">
-          <span>{hint}</span>
-        </span>
-      )}
+      <input id={id} name={id} value={value} onChange={onChange} />
       {error && <span className="field-error">{error}</span>}
     </div>
   );

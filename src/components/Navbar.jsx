@@ -5,22 +5,15 @@ import { useToast } from "../context/useToast";
 import { profileName, profileAvatar } from "../lib/profile";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Home", num: "01", end: true },
-  { to: "/feed", label: "Feed", num: "02" },
-  { to: "/about", label: "About", num: "03" },
+  { to: "/", label: "Home", end: true },
+  { to: "/feed", label: "Feed" },
+  { to: "/about", label: "About" },
 ];
-
-const DATE_STAMP = new Date().toLocaleDateString("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-});
 
 export function NavLinks({ onNavigate }) {
   const { user } = useAuth();
   return (
     <>
-      <p className="sidebar-label">Index</p>
       {NAV_ITEMS.map((item) => (
         <NavLink
           key={item.to}
@@ -29,16 +22,16 @@ export function NavLinks({ onNavigate }) {
           className="sidebar-link"
           onClick={onNavigate}
         >
-          <span className="sidebar-link-num">{item.num}</span> {item.label}
+          {item.label}
         </NavLink>
       ))}
       {user && (
         <>
           <NavLink to="/my-posts" className="sidebar-link" onClick={onNavigate}>
-            <span className="sidebar-link-num">04</span> My entries
+            My entries
           </NavLink>
           <NavLink to="/profile" className="sidebar-link" onClick={onNavigate}>
-            <span className="sidebar-link-num">05</span> Profile
+            Profile
           </NavLink>
         </>
       )}
@@ -123,6 +116,8 @@ export default function Navbar() {
             className="navbar-burger"
             onClick={() => setOpen(true)}
             aria-label="Open menu"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
           >
             <span /><span /><span />
           </button>
@@ -131,15 +126,8 @@ export default function Navbar() {
             <span className="navbar-brand-mark">
               <SprigMark size={20} />
             </span>
-            <span className="navbar-brand-text">
-              <span className="navbar-brand-word">Leafy</span>
-              <em className="navbar-brand-tag">Field Notes</em>
-            </span>
+            <span className="navbar-brand-word">Leafy</span>
           </Link>
-
-          <div className="navbar-stamp" aria-hidden="true">
-            Vol. 01 · {DATE_STAMP}
-          </div>
         </div>
       </header>
 
@@ -147,6 +135,7 @@ export default function Navbar() {
         <div className="mobile-overlay" onClick={() => setOpen(false)}>
           <aside
             ref={drawerRef}
+            id="mobile-menu"
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
@@ -187,7 +176,6 @@ function MobileDrawerContent({ onClose }) {
       <div className="mobile-drawer-foot">
         {user ? (
           <>
-            <span className="sidebar-label">Account</span>
             <Link to="/profile" className="sidebar-account" onClick={onClose}>
               <img
                 className="avatar avatar-sm"
@@ -209,12 +197,11 @@ function MobileDrawerContent({ onClose }) {
           </>
         ) : (
           <>
-            <span className="sidebar-label">Account</span>
             <Link to="/login" className="btn btn-ghost btn-block" onClick={onClose}>
               Log in
             </Link>
             <Link to="/register" className="btn btn-primary btn-block" onClick={onClose}>
-              Sign up
+              Create account
             </Link>
           </>
         )}

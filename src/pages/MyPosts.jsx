@@ -5,7 +5,7 @@ import { useToast } from "../context/useToast";
 import { getPostsByOwner, deletePost } from "../api/posts";
 import EmptyState from "../components/EmptyState";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { POST_TYPE_LABELS, POST_TYPES, entryNumber } from "../lib/postForm";
+import { POST_TYPE_LABELS, POST_TYPES } from "../lib/postForm";
 import SearchBar from "../components/SearchBar";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
@@ -97,23 +97,21 @@ function MyPostsView({ user }) {
     <>
       <header className="feed-header">
         <h1>My entries</h1>
-        <p className="feed-sub">
-          {posts.length} {posts.length === 1 ? "entry" : "entries"} filed
-        </p>
       </header>
 
       <SearchBar
         value={search}
         onChange={setSearch}
-        label="Find in your entries"
-        placeholder="Search by title, description, or plant…"
+        placeholder="Search by title, description, or plant"
       />
 
       <nav className="feed-filters">
         {FILTERS.map((f) => (
           <button
             key={f.value}
+            type="button"
             className={`feed-filter ${filter === f.value ? "active" : ""}`}
+            aria-pressed={filter === f.value}
             onClick={() => setFilter(f.value)}
             disabled={counts[f.value] === 0 && f.value !== ""}
           >
@@ -133,9 +131,7 @@ function MyPostsView({ user }) {
 
       {!loading && !error && posts.length === 0 && (
         <EmptyState
-          kicker="Nothing yet"
           title="You have not written an entry."
-          message="Start with a care guide for a plant you know well, or ask the community a question."
           ctaTo="/create"
           ctaLabel="Write your first entry"
         />
@@ -143,16 +139,10 @@ function MyPostsView({ user }) {
 
       {!loading && posts.length > 0 && filtered.length === 0 && (
         <EmptyState
-          kicker="No matches"
           title={
             debouncedSearch.trim()
               ? `Nothing matches “${debouncedSearch.trim()}”.`
-              : "Nothing under this filter."
-          }
-          message={
-            debouncedSearch.trim()
-              ? "Try a different word, or clear the search."
-              : "You have not written any entries of this type yet."
+              : "No entries of this type."
           }
         />
       )}
@@ -181,12 +171,9 @@ function MyPostsView({ user }) {
 
 function EntryTile({ post, onDelete }) {
   const type = post.post_type ?? "guide";
-  const num = entryNumber(post.id);
 
   return (
     <article className={`entry-tile entry-tile-${type}`}>
-      <span className="entry-tile-ghost" aria-hidden="true">{num}</span>
-
       <header className="entry-tile-head">
         <span className={`type type-${type}`}>{POST_TYPE_LABELS[type]}</span>
       </header>

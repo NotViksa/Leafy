@@ -55,7 +55,6 @@ export default function Create() {
   return (
     <PostForm
       pageTitle="New entry"
-      subtitle="Share a guide, ask a question, or show off your plant"
       form={form}
       errors={errors}
       apiError={apiError}

@@ -127,42 +127,16 @@ h1, h2, h3, h4 {
 }
 .navbar-brand:hover .navbar-brand-mark { border-color: var(--rust); color: var(--rust); }
 
-.navbar-brand-text { display: flex; flex-direction: column; line-height: 1; }
-
 .navbar-brand-word {
   font-family: var(--serif);
   font-style: italic;
   font-weight: 600;
   font-size: 19px;
+  line-height: 1;
   letter-spacing: -0.02em;
   color: var(--sage-dark);
 }
 .navbar-brand:hover .navbar-brand-word { color: var(--rust); }
-
-.navbar-brand-tag {
-  font-family: var(--sans);
-  font-style: normal;
-  font-weight: 500;
-  font-size: 9px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--ink-mute);
-  margin-top: 3px;
-}
-
-.navbar-stamp {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 12px;
-  color: var(--ink-mute);
-  letter-spacing: 0.02em;
-  pointer-events: none;
-  white-space: nowrap;
-}
 
 /* Sidebar */
 .sidebar {
@@ -198,17 +172,6 @@ html[data-nav="hidden"] .sidebar {
 }
 .sidebar-cta:hover { background: var(--sage-deep); border-color: var(--sage-deep); }
 
-.sidebar-label {
-  font-family: var(--sans);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-mute);
-  margin: 18px 0 8px;
-  padding: 0 4px;
-}
-
 .sidebar-link {
   display: flex;
   align-items: baseline;
@@ -220,18 +183,8 @@ html[data-nav="hidden"] .sidebar {
   border-bottom: 1px solid transparent;
 }
 
-.sidebar-link-num {
-  font-family: var(--serif);
-  font-size: 11px;
-  color: var(--sage);
-  letter-spacing: 0.05em;
-  min-width: 18px;
-}
-
 .sidebar-link:hover { color: var(--sage-dark); }
-.sidebar-link:hover .sidebar-link-num { color: var(--rust); }
 .sidebar-link.active { color: var(--sage-dark); font-weight: 500; }
-.sidebar-link.active .sidebar-link-num { color: var(--rust); }
 
 .sidebar-foot {
   margin-top: auto;
@@ -337,9 +290,7 @@ html[data-nav="hidden"] .sidebar {
   .app-main { max-width: none; }
   .navbar-inner { padding: 0 20px; gap: 12px; }
   .navbar-burger { display: flex; }
-  .navbar-stamp { display: none; }
   .navbar-brand-word { font-size: 17px; }
-  .navbar-brand-tag { display: none; }
   .navbar-brand-mark { width: 28px; height: 28px; }
   .footer { padding: 24px; }
 }

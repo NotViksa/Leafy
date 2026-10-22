@@ -45,8 +45,8 @@ comments when written.
 ## 4. Routing structure
 
 Eleven routes: `/`, `/feed`, `/feed/:postId`, `/about`, `/login`, `/register`,
-`/create`_, `/my-posts`_, `/profile`_, `/feed/:postId/edit`_, `*` (404).
-`*` = authenticated.
+`/create`, `/my-posts`, `/profile`, `/feed/:postId/edit` (authenticated), and
+`*` (404).
 
 - `ProtectedRoute` sends guests to `/login` and returns them afterwards;
   `GuestRoute` keeps logged-in users out of Login/Register.

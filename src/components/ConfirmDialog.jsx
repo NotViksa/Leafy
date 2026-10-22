@@ -36,7 +36,6 @@ export default function ConfirmDialog({
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="confirm-kicker">Please confirm</p>
         <h2 className="confirm-title">{title}</h2>
         {message && <p className="confirm-message">{message}</p>}
         {error && <p className="confirm-error" role="alert">{error}</p>}

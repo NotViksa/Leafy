@@ -1,24 +1,23 @@
 import { useState } from "react";
 import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/useToast";
 import ProfilePreview from "./ProfilePreview";
-import { FormSectionHead, FormField } from "./FormElements";
-import { profileName } from "../lib/profile";
+import { FormField } from "./FormElements";
 
 const MAX_NAME = 40;
 
 export default function ProfileForm() {
   const { user, updateProfile } = useAuth();
+  const notify = useToast();
   const [name, setName] = useState(user?.user_metadata?.display_name ?? "");
   const [avatar, setAvatar] = useState(user?.user_metadata?.avatar_url ?? "");
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
-  const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
   function change(setter, field) {
     return (e) => {
       setter(e.target.value);
-      setSaved(false);
       if (errors[field]) setErrors({ ...errors, [field]: undefined });
     };
   }
@@ -52,7 +51,7 @@ export default function ProfileForm() {
         display_name: name.trim() || null,
         avatar_url: avatar.trim() || null,
       });
-      setSaved(true);
+      notify("Profile saved.");
     } catch (err) {
       setApiError(err.message || "Could not save profile");
     } finally {
@@ -64,7 +63,6 @@ export default function ProfileForm() {
     <div className="editor">
       <header className="editor-head">
         <h1>Your profile</h1>
-        <p>Signed in as {user.email}</p>
       </header>
 
       <div className="editor-grid">
@@ -72,27 +70,18 @@ export default function ProfileForm() {
           {apiError && <p className="form-error" role="alert">{apiError}</p>}
 
           <section className="editor-section">
-            <FormSectionHead num="I." title="Identity" />
             <FormField
               id="profile-name"
               label="Display name"
               value={name}
               onChange={change(setName, "name")}
-              placeholder={profileName(user)}
-              hint="Empty falls back to the name part of your email."
               error={errors.name}
             />
-          </section>
-
-          <section className="editor-section">
-            <FormSectionHead num="II." title="Portrait" />
             <FormField
               id="profile-avatar"
-              label="Avatar image URL"
+              label="Avatar URL"
               value={avatar}
               onChange={change(setAvatar, "avatar")}
-              placeholder="https://…"
-              hint="A square image works best. Empty uses the gray placeholder."
               error={errors.avatar}
             />
           </section>
@@ -101,7 +90,6 @@ export default function ProfileForm() {
             <button type="submit" className="btn btn-primary" disabled={saving}>
               {saving ? "Saving…" : "Save profile"}
             </button>
-            {saved && <span className="profile-saved">Profile saved.</span>}
           </div>
         </form>
 

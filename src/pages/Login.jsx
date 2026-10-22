@@ -80,9 +80,9 @@ export default function Login() {
         {submitting ? "Signing in…" : "Sign in"}
       </button>
 
-      <p className="form-foot">
-        No account? <Link to="/register">Create one</Link>
-      </p>
+      <Link to="/register" className="btn btn-ghost btn-block form-alt">
+        Create an account
+      </Link>
     </form>
   );
 }

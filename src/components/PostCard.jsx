@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { POST_TYPE_LABELS, entryNumber } from "../lib/postForm";
+import { POST_TYPE_LABELS } from "../lib/postForm";
 
 const CTA_LABELS = {
   guide: "Read the guide",
@@ -14,8 +14,6 @@ export default function PostCard({ post }) {
 
   return (
     <article className={`post post-type-${type}`}>
-      <div className="post-num">N°{entryNumber(post.id)}</div>
-
       <div className="post-body">
         <div className="post-meta">
           <span className={`type type-${type}`}>{POST_TYPE_LABELS[type]}</span>

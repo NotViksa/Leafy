@@ -17,11 +17,7 @@ export default class ErrorBoundary extends Component {
 
     return (
       <div className="empty-state">
-        <span className="empty-state-kicker">Something went wrong</span>
         <p className="empty-state-title">This page could not be displayed.</p>
-        <p className="empty-state-message">
-          An unexpected error interrupted this page. You can try again, or head back to the feed.
-        </p>
         <div className="error-actions">
           <button
             type="button"

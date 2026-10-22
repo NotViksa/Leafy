@@ -1,8 +1,8 @@
 export default function SearchBar({
   value,
   onChange,
-  label = "Find",
-  placeholder,
+  label = "Search",
+  placeholder = "Search entries",
 }) {
   return (
     <div className="search-bar">
@@ -15,7 +15,7 @@ export default function SearchBar({
           type="search"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder ?? "Search entries…"}
+          placeholder={placeholder}
           autoComplete="off"
           spellCheck={false}
         />

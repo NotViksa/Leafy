@@ -2,22 +2,9 @@ import { POST_TYPE_LABELS } from "../lib/postForm";
 
 export default function PostPreview({ form }) {
   const type = form.post_type ?? "guide";
-  const hasAny = form.title.trim() || form.description.trim() || form.image_url.trim();
-
-  if (!hasAny) {
-    return (
-      <div className="preview">
-        <span className="preview-label">Live preview</span>
-        <div className="preview-card">
-          <p className="preview-empty">Start typing to see how this will look on the feed.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="preview">
-      <span className="preview-label">Live preview</span>
+    <aside className="preview" aria-label="Live preview">
       <div className="preview-card">
         <div className="preview-meta">
           <span className={`type type-${type}`}>{POST_TYPE_LABELS[type]}</span>
@@ -50,6 +37,6 @@ export default function PostPreview({ form }) {
           <p className="preview-desc">{form.description}</p>
         )}
       </div>
-    </div>
+    </aside>
   );
 }

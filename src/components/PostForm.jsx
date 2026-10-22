@@ -7,12 +7,10 @@ import {
   LIGHT_NEEDS,
   fieldsFor,
   descriptionLabel,
-  descriptionHint,
 } from "../lib/postForm";
 
 export default function PostForm({
   pageTitle,
-  subtitle,
   form,
   errors,
   apiError,
@@ -30,7 +28,6 @@ export default function PostForm({
     <div className="editor">
       <header className="editor-head">
         <h1>{pageTitle}</h1>
-        <p>{subtitle}</p>
       </header>
 
       <div className="editor-grid">
@@ -38,13 +35,14 @@ export default function PostForm({
           {apiError && <p className="form-error" role="alert">{apiError}</p>}
 
           <section className="editor-section">
-            <FormSectionHead num="I." title="Type" />
+            <FormSectionHead title="Type" />
             <div className="type-tabs">
               {POST_TYPES.map((t) => (
                 <button
                   key={t.value}
                   type="button"
                   className={`type-tab ${form.post_type === t.value ? "active" : ""}`}
+                  aria-pressed={form.post_type === t.value}
                   onClick={() =>
                     onChange({ target: { name: "post_type", value: t.value } })
                   }
@@ -56,41 +54,33 @@ export default function PostForm({
           </section>
 
           <section className="editor-section">
-            <FormSectionHead num="II." title="Identity" />
+            <FormSectionHead title="Identity" />
             <FormField
               id="title"
               label="Title"
               value={form.title}
               onChange={onChange}
-              placeholder={placeholderFor(form.post_type, "title")}
               error={errors.title}
             />
             <FormField
               id="plant_name"
-              label={f.plant ? "Plant name" : "Plant name (optional)"}
+              label="Plant name"
               value={form.plant_name}
               onChange={onChange}
-              placeholder="Monstera Deliciosa"
               error={errors.plant_name}
             />
             <FormField
               id="image_url"
-              label={f.imageRequired ? "Image URL" : "Image URL (optional)"}
+              label="Image URL"
               value={form.image_url}
               onChange={onChange}
-              placeholder="https://…"
-              hint={
-                f.imageRequired
-                  ? "Required for a showcase - the full image is shown, never cropped."
-                  : "The full image is shown, never cropped."
-              }
               error={errors.image_url}
             />
           </section>
 
           {f.care && (
             <section className="editor-section">
-              <FormSectionHead num="III." title="Care" />
+              <FormSectionHead title="Care" />
               <div className="editor-row-3">
                 <Select
                   id="care_level"
@@ -113,7 +103,6 @@ export default function PostForm({
                   label="Watering"
                   value={form.water_frequency}
                   onChange={onChange}
-                  placeholder="Once a week"
                   error={errors.water_frequency}
                 />
               </div>
@@ -121,15 +110,13 @@ export default function PostForm({
           )}
 
           <section className="editor-section">
-            <FormSectionHead num={f.care ? "IV." : "III."} title="Content" />
+            <FormSectionHead title="Content" />
             <Textarea
               id="description"
               label={descriptionLabel(form.post_type)}
               value={form.description}
               onChange={onChange}
-              placeholder={placeholderFor(form.post_type, "description")}
               maxLength={520}
-              hint={descriptionHint(form.post_type)}
               counter={`${form.description.trim().length}/500`}
               error={errors.description}
             />
@@ -139,9 +126,7 @@ export default function PostForm({
                 label="The full guide"
                 value={form.content}
                 onChange={onChange}
-                placeholder="Care instructions, tips, common mistakes, personal notes…"
                 className="tall"
-                hint="Shown on the details page. Blank lines create paragraphs."
                 error={errors.content}
               />
             )}
@@ -161,23 +146,6 @@ export default function PostForm({
   );
 }
 
-function placeholderFor(type, field) {
-  if (field === "title") {
-    return {
-      guide: "Monstera care 101",
-      question: "Why are my leaves yellowing?",
-      showcase: "My monstera hit the ceiling",
-      tip: "Water less in winter",
-    }[type] ?? "Title";
-  }
-  return {
-    guide: "One or two sentences that appear on the feed card.",
-    question: "Give context - pot, light, watering, how long this has been happening.",
-    showcase: "A few words about the photo.",
-    tip: "A short piece of advice.",
-  }[type] ?? "";
-}
-
 function Select({ id, label, value, onChange, options, error }) {
   return (
     <div className="editor-field">
@@ -192,7 +160,7 @@ function Select({ id, label, value, onChange, options, error }) {
   );
 }
 
-function Textarea({ id, label, value, onChange, placeholder, maxLength, hint, counter, error, className = "" }) {
+function Textarea({ id, label, value, onChange, maxLength, counter, error, className = "" }) {
   return (
     <div className="editor-field">
       <label htmlFor={id}>{label}</label>
@@ -201,16 +169,10 @@ function Textarea({ id, label, value, onChange, placeholder, maxLength, hint, co
         name={id}
         value={value}
         onChange={onChange}
-        placeholder={placeholder}
         maxLength={maxLength}
         className={className}
       />
-      {(hint || counter) && (
-        <span className="editor-field-foot">
-          {hint && <span>{hint}</span>}
-          {counter && <span>{counter}</span>}
-        </span>
-      )}
+      {counter && <span className="editor-field-count">{counter}</span>}
       {error && <span className="field-error">{error}</span>}
     </div>
   );

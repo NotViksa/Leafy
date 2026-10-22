@@ -97,9 +97,8 @@ export default function CommentList({ comments, onDeleted, onUpdated }) {
     <>
       {error && <p className="field-error" role="alert">{error}</p>}
       <ul className="comment-list">
-        {comments.map((c, i) => (
+        {comments.map((c) => (
           <li key={c.id} className="comment">
-            <span className="comment-num">{String(i + 1).padStart(2, "0")}</span>
             <img
               className="avatar avatar-md"
               src={c.author_avatar || DEFAULT_AVATAR}
@@ -149,6 +148,7 @@ export default function CommentList({ comments, onDeleted, onUpdated }) {
                     onChange={(e) => setDraft(e.target.value)}
                     rows={3}
                     maxLength={COMMENT_MAX_LEN + 50}
+                    aria-label="Edit comment"
                   />
                   <div className="comment-edit-actions">
                     <button

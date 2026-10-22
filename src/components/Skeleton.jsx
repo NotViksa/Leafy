@@ -5,9 +5,6 @@ function SkeletonLine({ width = "100%", height = 12 }) {
 export function PostCardSkeleton() {
   return (
     <article className="post post-skeleton" aria-hidden="true">
-      <div className="post-num">
-        <SkeletonLine width="28px" height={10} />
-      </div>
       <div className="post-body">
         <div className="post-meta">
           <SkeletonLine width="70px" height={14} />

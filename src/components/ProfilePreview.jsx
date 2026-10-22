@@ -7,8 +7,7 @@ export default function ProfilePreview({ name, avatar }) {
   const shownAvatar = avatar.trim() || DEFAULT_AVATAR;
 
   return (
-    <div className="preview">
-      <span className="preview-label">How you appear</span>
+    <aside className="preview" aria-label="Profile preview">
       <div className="preview-card">
         <div className="author-line">
           <img
@@ -18,15 +17,11 @@ export default function ProfilePreview({ name, avatar }) {
             width="40"
             height="40"
           />
-          <div>
-            <span className="author-line-name">{shownName}</span>
-            <span className="author-line-label">Author</span>
-          </div>
+          <span className="author-line-name">{shownName}</span>
         </div>
 
         <ul className="comment-list preview-comment-list">
           <li className="comment">
-            <span className="comment-num">01</span>
             <img
               className="avatar avatar-md"
               src={shownAvatar}
@@ -39,12 +34,11 @@ export default function ProfilePreview({ name, avatar }) {
                 <span className="comment-author">{shownName}</span>
                 <span className="comment-date">{STAMP}</span>
               </div>
-              <p className="comment-body">
-                Looks happy on that bright windowsill.
-              </p>            </div>
+              <p className="comment-body">Looks happy on that bright windowsill.</p>
+            </div>
           </li>
         </ul>
       </div>
-    </div>
+    </aside>
   );
 }

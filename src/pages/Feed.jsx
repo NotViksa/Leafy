@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useInfinitePosts } from "../hooks/useInfinitePosts";
-import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import PostCard from "../components/PostCard";
 import EmptyState from "../components/EmptyState";
 import SearchBar from "../components/SearchBar";
@@ -16,20 +15,43 @@ export default function Feed() {
   const urlQuery = searchParams.get("q") ?? "";
 
   const [searchInput, setSearchInput] = useState(urlQuery);
-  const debouncedSearch = useDebouncedValue(searchInput, 350);
+  const searchTimerRef = useRef(null);
+  const lastUrlQueryRef = useRef(urlQuery);
 
   useEffect(() => {
-    if (debouncedSearch === urlQuery) return;
+    if (urlQuery === lastUrlQueryRef.current) return;
+    lastUrlQueryRef.current = urlQuery;
+    clearTimeout(searchTimerRef.current);
+    setSearchInput(urlQuery);
+  }, [urlQuery]);
+
+  useEffect(() => () => clearTimeout(searchTimerRef.current), []);
+
+  function pushSearch(value) {
+    clearTimeout(searchTimerRef.current);
+    const query = value.trim();
+    lastUrlQueryRef.current = query;
+    if (query === urlQuery) return;
+
     const next = {};
     if (typeFilter) next.type = typeFilter;
-    if (debouncedSearch.trim()) next.q = debouncedSearch.trim();
+    if (query) next.q = query;
     setSearchParams(next, { replace: true });
-  }, [debouncedSearch, typeFilter, urlQuery, setSearchParams]);
+  }
+
+  function handleSearchChange(value) {
+    setSearchInput(value);
+    clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => pushSearch(value), 350);
+  }
 
   function setFilter(value) {
+    clearTimeout(searchTimerRef.current);
+    const query = searchInput.trim();
     const next = {};
     if (value) next.type = value;
-    if (urlQuery) next.q = urlQuery;
+    if (query) next.q = query;
+    lastUrlQueryRef.current = query;
     setSearchParams(next);
   }
 
@@ -37,21 +59,21 @@ export default function Feed() {
     <>
       <header className="feed-header">
         <h1>The Feed</h1>
-        <p className="feed-sub">Volume 01 · A community of plant keepers</p>
       </header>
 
       <SearchBar
         value={searchInput}
-        onChange={setSearchInput}
-        label="Find in the feed"
-        placeholder="Search by title or description…"
+        onChange={handleSearchChange}
+        placeholder="Search by title or description"
       />
 
       <nav className="feed-filters">
         {FILTERS.map((f) => (
           <button
             key={f.value}
+            type="button"
             className={`feed-filter ${typeFilter === f.value ? "active" : ""}`}
+            aria-pressed={typeFilter === f.value}
             onClick={() => setFilter(f.value)}
           >
             {f.label}
@@ -114,18 +136,12 @@ function FeedResults({ postType, search, urlQuery, typeFilter }) {
 
       {isEmpty && (
         <EmptyState
-          kicker={urlQuery ? "No matches" : typeFilter ? "No matches" : "Blank page"}
           title={
             urlQuery
               ? `Nothing matches “${urlQuery}”.`
               : typeFilter
-              ? "Nothing under this filter yet."
+              ? "No entries of this type."
               : "The feed is empty."
-          }
-          message={
-            urlQuery
-              ? "Try a different word, or clear the search."
-              : "Be the first to share a plant guide with the community."
           }
           ctaTo={urlQuery ? undefined : "/create"}
           ctaLabel={urlQuery ? undefined : "Write the first entry"}

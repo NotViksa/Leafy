@@ -31,7 +31,7 @@ export async function getPostById(id, signal) {
 export async function getPostsByOwner(ownerId, signal) {
   const url = tableUrl("posts", {
     owner_id: `eq.${ownerId}`,
-    order: "created_at.desc",
+    order: "created_at.desc,id.desc",
     select: "*",
   });
   const response = await fetch(url, { headers: authHeaders(), signal });

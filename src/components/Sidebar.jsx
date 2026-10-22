@@ -20,7 +20,7 @@ export default function Sidebar() {
       {user ? (
         <Link to="/create" className="sidebar-cta">New entry</Link>
       ) : (
-        <Link to="/register" className="sidebar-cta">Join the community</Link>
+        <Link to="/register" className="sidebar-cta">Create account</Link>
       )}
 
       <NavLinks />
@@ -28,7 +28,6 @@ export default function Sidebar() {
       <div className="sidebar-foot">
         {user ? (
           <>
-            <span className="sidebar-label">Account</span>
             <Link to="/profile" className="sidebar-account">
               <img
                 className="avatar avatar-sm"
@@ -49,11 +48,7 @@ export default function Sidebar() {
             </button>
           </>
         ) : (
-          <>
-            <span className="sidebar-label">Account</span>
-            <Link to="/login" className="btn btn-ghost btn-block">Log in</Link>
-            <Link to="/register" className="btn btn-primary btn-block">Sign up</Link>
-          </>
+          <Link to="/login" className="btn btn-ghost btn-block">Log in</Link>
         )}
       </div>
     </aside>
