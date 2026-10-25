@@ -3,7 +3,7 @@
 A houseplant community journal. Members write care guides, questions, showcases,
 and tips; the UI is styled like a botanist's field notebook.
 
-Live: https://leafy-viksa1.vercel.app · Repo: https://github.com/NotViksa/Leafy
+Live: https://leafy-viksa1.vercel.app
 
 Demo admin: `admin@leafy.app` / `leafyadmin123` - log in with it to try the
 moderation role (can delete any entry or comment; editing stays author-only).
@@ -58,9 +58,10 @@ Eleven routes: `/`, `/feed`, `/feed/:postId`, `/about`, `/login`, `/register`,
 ## 5. List → details flow
 
 - **Feed (catalog):** six posts per page, newest first, via `GET /posts`.
-  Infinite scroll uses an `IntersectionObserver` and loops when the database
-  runs out. Tabs write `?type=`; debounced search writes `?q=` and matches
-  title/description with `ilike`.
+  Infinite scroll uses an `IntersectionObserver`; the unfiltered feed loops when
+  the database runs out, while filters and search stop at the last result. Tabs
+  write `?type=`; debounced search writes `?q=` and matches title/description
+  with `ilike`.
 - **Details:** opened via `Link`; reads `postId` with `useParams`, fetches the
   post and comments in parallel, aborts on unmount.
 - **My entries:** the author's posts in a tile grid with client-side filter and
@@ -94,10 +95,12 @@ owner or admin; admins may delete posts.
 Register, Login, Create, Edit, Comment, Profile - controlled inputs, synthetic
 events, `noValidate`, per-field errors, API error blocks, loading labels.
 
-- **Title:** required, 3-120 characters. **Description:** required, 10-500.
+- **Title:** required, 3-120 characters.
+- **Description:** required, 10-500.
 - **Comment:** required, max 500 characters (create and edit).
 - **Image URL:** optional except showcases; must start with `http://` or
-  `https://` if present. **Plant name:** required for guides/showcases, <80 chars.
+  `https://` if present.
+- **Plant name:** required for guides/showcases, <80 chars.
 - **Email/password:** email pattern, 6+ characters, confirmation must match;
   **profile:** display name 2-40 characters, avatar URL must be http(s).
 

@@ -26,9 +26,11 @@ export function useInfinitePosts(postType, search) {
   const loadingRef = useRef(false);
   const seenRef = useRef(new Set());
   const genRef = useRef(0);
+  const doneRef = useRef(false);
+  const shouldLoop = !postType && !search;
 
   const loadMore = useCallback(async () => {
-    if (loadingRef.current) return;
+    if (loadingRef.current || doneRef.current) return;
     loadingRef.current = true;
     setLoading(true);
     setError("");
@@ -45,7 +47,7 @@ export function useInfinitePosts(postType, search) {
 
       if (myGen !== genRef.current) return;
 
-      if (page.length === 0 && offsetRef.current > 0) {
+      if (page.length === 0 && offsetRef.current > 0 && shouldLoop) {
         offsetRef.current = 0;
         loopRef.current += 1;
         page = await getPostsPage(0, PAGE_SIZE, postType, search);
@@ -53,6 +55,7 @@ export function useInfinitePosts(postType, search) {
       }
 
       if (page.length === 0) {
+        doneRef.current = true;
         setHasLoadedOnce(true);
         return;
       }
@@ -63,8 +66,13 @@ export function useInfinitePosts(postType, search) {
       if (fresh.length > 0) setPosts((prev) => [...prev, ...fresh]);
 
       if (page.length < PAGE_SIZE) {
-        offsetRef.current = 0;
-        loopRef.current = loop + 1;
+        if (shouldLoop) {
+          offsetRef.current = 0;
+          loopRef.current = loop + 1;
+        } else {
+          doneRef.current = true;
+          offsetRef.current = 0;
+        }
       } else {
         offsetRef.current += PAGE_SIZE;
       }
@@ -79,11 +87,15 @@ export function useInfinitePosts(postType, search) {
         setLoading(false);
       }
     }
-  }, [postType, search]);
+  }, [postType, search, shouldLoop]);
 
   useEffect(() => {
     const myGen = ++genRef.current;
     loadingRef.current = true;
+    offsetRef.current = 0;
+    loopRef.current = 0;
+    seenRef.current = new Set();
+    doneRef.current = false;
 
     (async () => {
       try {
@@ -94,8 +106,13 @@ export function useInfinitePosts(postType, search) {
         setPosts(pickFresh(page, loop, seenRef));
 
         if (page.length < PAGE_SIZE) {
-          offsetRef.current = 0;
-          loopRef.current = loop + 1;
+          if (shouldLoop) {
+            offsetRef.current = 0;
+            loopRef.current = loop + 1;
+          } else {
+            doneRef.current = true;
+            offsetRef.current = 0;
+          }
         } else {
           offsetRef.current = PAGE_SIZE;
         }
@@ -111,7 +128,7 @@ export function useInfinitePosts(postType, search) {
         }
       }
     })();
-  }, [postType, search]);
+  }, [postType, search, shouldLoop]);
 
   return { posts, loading, error, loadMore, hasLoadedOnce };
 }
